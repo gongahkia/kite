@@ -2,7 +2,7 @@
 
 # `Kite` 🪄
 
-...
+`Kite` is an all-in-one Python Library serving ..., designed for [legal technologists](https://www.thomsonreuters.com/en-us/posts/technology/generalist-legal-technologist/) and [tinkerers](tinkerers).
 
 ## Stack
 
