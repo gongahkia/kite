@@ -40,7 +40,122 @@ It serves [Jurisdiction](https://dictionary.cambridge.org/dictionary/english/jur
 ## Architecture
 
 ```mermaid
-... reference https://github.com/gongahkia/kiwi
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#fff5e6', 'edgeLabelBackground':'#fff'}}}%%
+flowchart TD
+    classDef examples fill:#D1E0FF,stroke:#333;
+    classDef src fill:#D1FFD1,stroke:#333;
+    classDef tests fill:#FFFFD1,stroke:#333;
+    classDef root fill:#FFD1D1,stroke:#333;
+
+    subgraph ROOT["kite (Root)"]
+        direction TB
+        main["main.py"]:::root
+        api["api.py"]:::root
+        cli["cli.py"]:::root
+        setup["setup.py"]:::root
+        pyproject["pyproject.toml"]:::root
+        precommit[".pre-commit-config.yaml"]:::root
+    end
+
+    subgraph EXAMPLES["examples/"]
+        direction TB
+        usage["usage_example.py"]
+    end
+    class EXAMPLES examples
+
+    subgraph SRC["src/"]
+        direction TB
+
+        subgraph CONFIG["config/"]
+            __init_config["__init__.py"]
+            subgraph JURISDICTIONS["jurisdictions/"]
+                __init_jurisdictions["__init__.py"]
+                br["br_config.yaml"]
+                cn["cn_config.yaml"]
+                de["de_config.yaml"]
+                eu["eu_config.yaml"]
+                fr["fr_config.yaml"]
+                jp["jp_config.yaml"]
+                ms["ms_config.yaml"]
+                sg["sg_config.yaml"]
+                uk["uk_config.yaml"]
+                us["us_config.yaml"]
+            end
+        end
+
+        subgraph EXTRACTORS["extractors/"]
+            __init_extractors["__init__.py"]
+            base["base.py"]
+            pdf["pdf_extractor.py"]
+            docx["docx_extractor.py"]
+            image_proc["image_processing.py"]
+        end
+
+        subgraph NLP["nlp/"]
+            __init_nlp["__init__.py"]
+            classifier["classifier.py"]
+            compliance["compliance.py"]
+            translation["translation.py"]
+        end
+
+        subgraph PLUGINS["plugins/"]
+            sample_plugin["sample_plugin.py"]
+        end
+
+        subgraph UTILS["utils/"]
+            __init_utils["__init__.py"]
+            file_utils["file_utils.py"]
+        end
+
+    end
+    class SRC src
+
+    subgraph TESTS["tests/"]
+        direction TB
+        test_main["test_main.py"]
+        test_extractors["test_extractors.py"]
+        test_nlp["test_nlp.py"]
+        test_cli["test_cli.py"]
+    end
+    class TESTS tests
+
+    %% Relations
+    main --> pdf
+    main --> docx
+    main --> classifier
+    main --> compliance
+    main --> translation
+    main --> __init_jurisdictions
+    main --> sample_plugin
+
+    api --> main
+    cli --> main
+
+    test_main --> main
+    test_extractors --> base
+    test_extractors --> pdf
+    test_extractors --> docx
+    test_nlp --> classifier
+    test_nlp --> compliance
+    test_nlp --> translation
+    test_cli --> cli
+
+    sample_plugin --> base
+
+    file_utils --> pdf
+    file_utils --> docx
+
+    pdf --> image_proc
+
+    usage --> main
+
+    %% Class assignments
+    class main,api,cli,setup,pyproject,precommit root
+    class usage examples
+    class __init_config,__init_jurisdictions,__init_extractors,__init_nlp,__init_utils src
+    class br,cn,de,eu,fr,jp,ms,sg,uk,us src
+    class __init_extractors,base,pdf,docx,image_proc,nlp,plugins,utils src
+    class test_main,test_extractors,test_nlp,test_cli tests
 ```
 
 ## Reference
