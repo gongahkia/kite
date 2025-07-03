@@ -1,0 +1,31 @@
+jurisdiction: France
+document_types:
+  contrat:
+    required_fields:
+      - parties
+      - signatures
+      - date_d'effet
+      - loi_applicable
+    risk_flags:
+      - signatures_manquantes
+      - clauses_périmées
+  jugement:
+    required_fields:
+      - numéro_affaire
+      - juge
+      - date_jugement
+    risk_flags:
+      - numéro_affaire_manquant
+  loi:
+    required_fields:
+      - numéro_loi
+      - date_promulgation
+      - autorité
+    risk_flags:
+      - numéro_loi_manquant
+languages:
+  - fr
+notes: >
+  France follows a civil law system. Contracts and judgments must comply 
+  with strict formal requirements, including French language and authorized 
+  signatures.

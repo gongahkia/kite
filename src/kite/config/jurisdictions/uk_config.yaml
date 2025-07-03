@@ -1,0 +1,31 @@
+jurisdiction: UK
+document_types:
+  contract:
+    required_fields:
+      - party_names
+      - signatures
+      - effective_date
+      - governing_law
+    risk_flags:
+      - missing_signatures
+      - outdated_clauses
+  court_decision:
+    required_fields:
+      - case_number
+      - judge
+      - decision_date
+    risk_flags:
+      - missing_case_number
+  statute:
+    required_fields:
+      - statute_number
+      - enactment_date
+      - authority
+    risk_flags:
+      - missing_statute_number
+languages:
+  - en
+notes: >
+  The United Kingdom uses a common law system. Contracts and court decisions 
+  must be clear on parties, signatures, and dates. Governing law is especially 
+  important for cross-border agreements.

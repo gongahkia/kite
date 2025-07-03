@@ -1,0 +1,31 @@
+jurisdiction: Brazil
+document_types:
+  contrato:
+    required_fields:
+      - partes
+      - assinaturas
+      - data_de_vigência
+      - lei_aplicável
+    risk_flags:
+      - assinaturas_ausentes
+      - cláusulas_desatualizadas
+  decisão_judicial:
+    required_fields:
+      - número_do_processo
+      - juiz
+      - data_da_decisão
+    risk_flags:
+      - número_do_processo_ausente
+  lei:
+    required_fields:
+      - número_da_lei
+      - data_de_promulgação
+      - autoridade
+    risk_flags:
+      - número_da_lei_ausente
+languages:
+  - pt
+notes: >
+  Brazil’s civil law system requires contracts and statutes 
+  to be in Portuguese. Legal documents must be comprehensive 
+  and comply with formal statutory requirements.

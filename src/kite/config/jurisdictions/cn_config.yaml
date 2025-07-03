@@ -1,0 +1,32 @@
+jurisdiction: China
+document_types:
+  contract:
+    required_fields:
+      - party_names
+      - signatures
+      - effective_date
+      - governing_law
+    risk_flags:
+      - missing_signatures
+      - outdated_clauses
+      - missing_governing_law
+  court_decision:
+    required_fields:
+      - case_number
+      - judge
+      - decision_date
+    risk_flags:
+      - missing_case_number
+  regulation:
+    required_fields:
+      - regulation_number
+      - issue_date
+      - authority
+    risk_flags:
+      - missing_regulation_number
+languages:
+  - zh
+notes: >
+  China’s civil law system requires contracts and official 
+  documents to be in Chinese. Governing law and regulatory 
+  compliance are critical for enforceability.

@@ -1,0 +1,31 @@
+jurisdiction: Japan
+document_types:
+  contract:
+    required_fields:
+      - party_names
+      - signatures
+      - effective_date
+      - governing_law
+    risk_flags:
+      - missing_signatures
+      - outdated_clauses
+  court_decision:
+    required_fields:
+      - case_number
+      - judge
+      - decision_date
+    risk_flags:
+      - missing_case_number
+  statute:
+    required_fields:
+      - statute_number
+      - enactment_date
+      - authority
+    risk_flags:
+      - missing_statute_number
+languages:
+  - ja
+notes: >
+  Japan has a civil law system influenced by German law. Contracts 
+  and court documents must be in Japanese and include proper identification 
+  of parties and legal authority.

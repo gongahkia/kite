@@ -1,0 +1,31 @@
+jurisdiction: Germany
+document_types:
+  vertrag:
+    required_fields:
+      - parteien
+      - unterschriften
+      - wirksamkeitsdatum
+      - geltendes_recht
+    risk_flags:
+      - fehlende_unterschriften
+      - veraltete_klauseln
+  urteil:
+    required_fields:
+      - aktenzeichen
+      - richter
+      - urteilsdatum
+    risk_flags:
+      - fehlendes_aktenzeichen
+  gesetz:
+    required_fields:
+      - gesetznummer
+      - erlassdatum
+      - behörde
+    risk_flags:
+      - fehlende_gesetznummer
+languages:
+  - de
+notes: >
+  Germany’s civil law system emphasizes formal written contracts 
+  and statutory compliance. German language is mandatory for official 
+  documents.
