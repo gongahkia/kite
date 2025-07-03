@@ -52,25 +52,73 @@ $ git clone https://github.com/gongahkia/kite && cd kite
 
 2. Include `Kite` directly as a [Library](https://docs.python.org/3/library/index.html) within your projects.
 
+### Extract Text, Images and Metadata
 
 ```py
+from src.main import extract_document
 
+result = extract_document("path/to/legal_document.pdf", lang="en")
+print("Jurisdiction:", result['jurisdiction'])
+print("Document Type:", result['document_type'])
+print("Extracted Data:", result['extracted_data'])
+print("Text (first 200 chars):", result['text'][:200])
+print("Metadata:", result['metadata'])
+print("Number of Images:", len(result['images']))
 ```
 
-```py
+### Detect Jurisdiction and apply [Conditional Extraction Rules](#coverage)
 
+```py
+from src.main import extract_document
+
+result = extract_document("path/to/legal_document.docx")
+print("Detected Jurisdiction:", result['jurisdiction'])
+print("Applied Rules:", result['extracted_data'])
 ```
 
-```py
+### Classify Legal Document Type
 
+```py
+from src.nlp.classifier import DocumentClassifier
+
+text = "This agreement is made between Party A and Party B..."
+doc_type = DocumentClassifier.classify(text, lang="en")
+print("Document Type:", doc_type)
 ```
 
-```py
+### Flag Compliance Risks
 
+```py
+from src.nlp.compliance import ComplianceChecker
+from src.config.jurisdictions import get_jurisdiction_config
+
+text = "This contract is made between..."
+config = get_jurisdiction_config("US")
+doc_type = "contract"
+risks = ComplianceChecker.check(text, config, doc_type)
+print("Compliance Risks:", risks)
 ```
 
-```py
+### Translate Extracted Text
 
+```py
+from src.nlp.translation import Translator
+
+text = "This agreement is made between Party A and Party B."
+translated = Translator.translate(text, target_lang="fr")
+print("French Translation:", translated)
+```
+
+### Batch Process Documents
+
+```py
+from src.utils.file_utils import list_files
+from src.main import extract_document
+
+files = list_files("path/to/legal_docs", extensions=[".pdf", ".docx"])
+for file_path in files:
+    result = extract_document(file_path)
+    print(f"{file_path}: {result['document_type']} ({result['jurisdiction']})")
 ```
 
 3. Alternatively, use `Kite` [CLI](./src/cli.py).
