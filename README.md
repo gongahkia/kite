@@ -6,7 +6,11 @@
 
 ## Stack
 
-...
+* *Script*: [Python]()
+    * 
+    * 
+* *Package*: [Docker]()
+* *Testing*: []()
 
 ## Coverage
 
