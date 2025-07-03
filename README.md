@@ -8,6 +8,10 @@
 
 ...
 
+## Coverage
+
+...
+
 ## Usage
 
 ```console
