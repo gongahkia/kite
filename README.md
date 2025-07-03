@@ -5,7 +5,7 @@
 
 `Kite` is an all-in-one Python Library designed for [legal technologists](https://www.thomsonreuters.com/en-us/posts/technology/generalist-legal-technologist/) and [tinkerers](tinkerers).
   
-It serves [Jurisdiction](https://dictionary.cambridge.org/dictionary/english/jurisdiction)-aware [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition) with Multi-language [Translation](https://academic.oup.com/book/2473/chapter/142746439), [Document Classification](https://en.wikipedia.org/wiki/Document_classification), [Compliance Flagging](https://acd.mlaw.gov.sg/compliance/red-flag-indicators/) and [Extensible Extraction Rulesets](https://docs.stoplight.io/docs/spectral/83527ef2dd8c0-extending-rulesets).
+It serves [Jurisdiction-aware](#coverage) [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition) with Multi-language [Translation](https://academic.oup.com/book/2473/chapter/142746439), [Document Classification](https://en.wikipedia.org/wiki/Document_classification), [Compliance Flagging](https://acd.mlaw.gov.sg/compliance/red-flag-indicators/) and [Extensible Extraction Rulesets](https://docs.stoplight.io/docs/spectral/83527ef2dd8c0-extending-rulesets).
   
 ## Stack
 
@@ -23,18 +23,66 @@ It serves [Jurisdiction](https://dictionary.cambridge.org/dictionary/english/jur
 
 ## Coverage
 
-...
+`Kite` currently supports [Jurisdiction-aware extraction](https://dictionary.cambridge.org/dictionary/english/jurisdiction) for the following jurisdictions.
+
+> Each jurisdiction config includes document types such as contracts, court decisions, statutes, and other relevant legal documents, with specific required fields and risk flags tailored to local legal requirements.
+> This multi-jurisdictional support enables Kite to handle diverse legal document formats and compliance needs across common law and civil law systems.
+
+* United States (US)
+* European Union (EU)
+* Singapore
+* India
+* Malaysia
+* United Kingdom (UK)
+* France
+* Germany
+* China
+* Japan
+* Brazil
 
 ## Usage
 
+The below instructions are for locally running `Kite` and using it within your project.
+
+1. Execute the below.
+
 ```console
-...
+$ git clone https://github.com/gongahkia/kite && cd kite
 ```
 
-...
+2. Include `Kite` directly as a [Library](https://docs.python.org/3/library/index.html) within your projects.
+
 
 ```py
-# ...
+
+```
+
+```py
+
+```
+
+```py
+
+```
+
+```py
+
+```
+
+```py
+
+```
+
+3. Alternatively, use `Kite` [CLI](./src/cli.py).
+
+```console
+$ python3 -m src.cli path/to/legal_document.docx --lang en --translate-to fr
+```
+
+4. Or run the `Kite` [Flask API server](./src/api.py).
+
+```console
+$ python3 -m src.api
 ```
 
 ## Architecture
