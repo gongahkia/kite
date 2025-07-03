@@ -1,0 +1,19 @@
+jurisdiction: US
+document_types:
+  contract:
+    required_fields:
+      - party_names
+      - signatures
+      - effective_date
+    risk_flags:
+      - missing_signatures
+      - outdated_clauses
+  court_decision:
+    required_fields:
+      - case_number
+      - judge
+      - decision_date
+    risk_flags:
+      - missing_case_number
+languages:
+  - en

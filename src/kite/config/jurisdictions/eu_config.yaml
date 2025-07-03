@@ -1,0 +1,24 @@
+jurisdiction: EU
+document_types:
+  contract:
+    required_fields:
+      - party_names
+      - signatures
+      - effective_date
+      - governing_law
+    risk_flags:
+      - missing_signatures
+      - outdated_clauses
+      - missing_governing_law
+  statute:
+    required_fields:
+      - statute_number
+      - enactment_date
+      - authority
+    risk_flags:
+      - missing_statute_number
+languages:
+  - en
+  - fr
+  - de
+  - es

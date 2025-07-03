@@ -1,0 +1,1 @@
+from .jurisdictions import get_jurisdiction_config
