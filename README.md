@@ -23,10 +23,7 @@ It serves [Jurisdiction-aware](#coverage) [OCR](https://en.wikipedia.org/wiki/Op
 
 ## Coverage
 
-`Kite` currently supports [Jurisdiction-aware extraction](https://dictionary.cambridge.org/dictionary/english/jurisdiction) for the following jurisdictions.
-
-> Each jurisdiction config includes document types such as contracts, court decisions, statutes, and other relevant legal documents, with specific required fields and risk flags tailored to local legal requirements.
-> This multi-jurisdictional support enables Kite to handle diverse legal document formats and compliance needs across common law and civil law systems.
+`Kite`'s [jurisdiction-aware extraction](https://dictionary.cambridge.org/dictionary/english/jurisdiction) currently supports the following regions.
 
 * United States (US)
 * European Union (EU)
@@ -40,9 +37,14 @@ It serves [Jurisdiction-aware](#coverage) [OCR](https://en.wikipedia.org/wiki/Op
 * Japan
 * Brazil
 
+> [!NOTE]  
+> Each jurisdiction's configuration includes document types such as contracts, court decisions, statutes, and other relevant legal documents which can be viewed [here](./src/config/jurisdictions/). 
+>  
+> To get your jurisdiction **added** or to **suggest an edit** an existing jurisdiction, please [open an issue](https://github.com/gongahkia/kite/issues).
+
 ## Usage
 
-The below instructions are for locally running `Kite` and using it within your project.
+The below instructions are for running `Kite` on your client machine.
 
 1. Execute the below.
 
@@ -50,13 +52,13 @@ The below instructions are for locally running `Kite` and using it within your p
 $ git clone https://github.com/gongahkia/kite && cd kite
 ```
 
-2. Alternatively, use `Kite` [CLI](./src/cli.py).
+2. To use `Kite` [CLI](./src/cli.py), run the below.
 
 ```console
 $ python3 -m src.cli path/to/legal_document.docx --lang en --translate-to fr
 ```
 
-3. Or run the `Kite` [Flask API server](./src/api.py).
+3. Alternatively, locally host the `Kite` [Flask API server](./src/api.py).
 
 ```console
 $ python3 -m src.api
