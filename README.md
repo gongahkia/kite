@@ -28,7 +28,7 @@ It serves [Jurisdiction-aware](#coverage) [OCR](https://en.wikipedia.org/wiki/Op
 >  
 > To get your jurisdiction **added** or to **suggest an edit** an existing jurisdiction, please [open an issue](https://github.com/gongahkia/kite/issues).
 
-`Kite`'s [jurisdiction-aware extraction](https://dictionary.cambridge.org/dictionary/english/jurisdiction) currently supports the following regions.
+`Kite`'s [jurisdiction](https://dictionary.cambridge.org/dictionary/english/jurisdiction)-aware extraction currently supports the following regions.
 
 * [United States](./src/config/jurisdictions/us_config.yaml)
 * [European Union](./src/config/jurisdictions/eu_config.yaml)
