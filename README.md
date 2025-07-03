@@ -21,26 +21,6 @@ It serves [Jurisdiction-aware](#coverage) [OCR](https://en.wikipedia.org/wiki/Op
 * *Linting*: [isort](https://pycqa.github.io/isort/), [black](https://pypi.org/project/black/), [flake8](https://flake8.pycqa.org/en/latest/)
 * *CI/CD*: [GitHub Actions](https://github.com/features/actions)
 
-## Coverage
-
-> [!NOTE]  
-> Each jurisdiction's configuration includes document types such as contracts, court decisions, statutes, and other relevant legal documents which can be viewed [here](./src/config/jurisdictions/). 
->  
-> To get your jurisdiction **added** or to **suggest an edit** an existing jurisdiction, please [open an issue](https://github.com/gongahkia/kite/issues).
-
-`Kite`'s [jurisdiction](https://dictionary.cambridge.org/dictionary/english/jurisdiction)-aware extraction currently supports the following regions.
-
-* [United States](./src/config/jurisdictions/us_config.yaml)
-* [European Union](./src/config/jurisdictions/eu_config.yaml)
-* [Singapore](./src/config/jurisdictions/sg_config.yaml)
-* [Malaysia](./src/config/jurisdictions/ms_config.yaml)
-* [United Kingdom](./src/config/jurisdictions/uk_config.yaml)
-* [France](./src/config/jurisdictions/fr_config.yaml)
-* [Germany](./src/config/jurisdictions/de_config.yaml)
-* [China](./src/config/jurisdictions/cn_config.yaml)
-* [Japan](./src/config/jurisdictions/jp_config.yaml)
-* [Brazil](./src/config/jurisdictions/br_config.yaml)
-
 ## Usage
 
 The below instructions are for running `Kite` on your client machine.
@@ -133,6 +113,26 @@ for file_path in files:
     result = extract_document(file_path)
     print(f"{file_path}: {result['document_type']} ({result['jurisdiction']})")
 ```
+
+## Coverage
+
+> [!NOTE]  
+> Each jurisdiction's configuration includes document types such as contracts, court decisions, statutes, and other relevant legal documents which can be viewed [here](./src/config/jurisdictions/). 
+>  
+> To get your jurisdiction **added** or to **suggest an edit** an existing jurisdiction, please [open an issue](https://github.com/gongahkia/kite/issues).
+
+`Kite`'s [jurisdiction](https://dictionary.cambridge.org/dictionary/english/jurisdiction)-aware extraction currently supports the following regions.
+
+* [United States](./src/config/jurisdictions/us_config.yaml)
+* [European Union](./src/config/jurisdictions/eu_config.yaml)
+* [Singapore](./src/config/jurisdictions/sg_config.yaml)
+* [Malaysia](./src/config/jurisdictions/ms_config.yaml)
+* [United Kingdom](./src/config/jurisdictions/uk_config.yaml)
+* [France](./src/config/jurisdictions/fr_config.yaml)
+* [Germany](./src/config/jurisdictions/de_config.yaml)
+* [China](./src/config/jurisdictions/cn_config.yaml)
+* [Japan](./src/config/jurisdictions/jp_config.yaml)
+* [Brazil](./src/config/jurisdictions/br_config.yaml)
 
 ## Architecture
 
