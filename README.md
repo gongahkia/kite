@@ -1,6 +1,6 @@
 [![](https://img.shields.io/badge/kite_1.0.0-passing-green)](https://github.com/gongahkia/kite/releases/tag/1.0.0) 
 
-# `Kite`
+# `Kite` 🪄
 
 ...
 
