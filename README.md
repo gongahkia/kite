@@ -50,9 +50,21 @@ The below instructions are for locally running `Kite` and using it within your p
 $ git clone https://github.com/gongahkia/kite && cd kite
 ```
 
-2. Include `Kite` directly as a [Library](https://docs.python.org/3/library/index.html) within your projects.
+2. Alternatively, use `Kite` [CLI](./src/cli.py).
 
-### Extract Text, Images and Metadata
+```console
+$ python3 -m src.cli path/to/legal_document.docx --lang en --translate-to fr
+```
+
+3. Or run the `Kite` [Flask API server](./src/api.py).
+
+```console
+$ python3 -m src.api
+```
+
+4. Most commonly, you would include `Kite` directly as a [Library](https://docs.python.org/3/library/index.html) within your projects.
+
+### [Extract](./src/extractors/) Text, Images and Metadata
 
 ```py
 from src.main import extract_document
@@ -66,7 +78,7 @@ print("Metadata:", result['metadata'])
 print("Number of Images:", len(result['images']))
 ```
 
-### Detect Jurisdiction and apply [Conditional Extraction Rules](#coverage)
+### [Detect](./src/extractors/) Jurisdiction and apply [Conditional Extraction Rules](#coverage)
 
 ```py
 from src.main import extract_document
@@ -76,7 +88,7 @@ print("Detected Jurisdiction:", result['jurisdiction'])
 print("Applied Rules:", result['extracted_data'])
 ```
 
-### Classify Legal Document Type
+### [Classify](./src/nlp/) Legal Document Type
 
 ```py
 from src.nlp.classifier import DocumentClassifier
@@ -86,7 +98,7 @@ doc_type = DocumentClassifier.classify(text, lang="en")
 print("Document Type:", doc_type)
 ```
 
-### Flag Compliance Risks
+### [Flag](./src/nlp/) Compliance Risks
 
 ```py
 from src.nlp.compliance import ComplianceChecker
@@ -99,7 +111,7 @@ risks = ComplianceChecker.check(text, config, doc_type)
 print("Compliance Risks:", risks)
 ```
 
-### Translate Extracted Text
+### [Translate](./src/nlp/) Extracted Text
 
 ```py
 from src.nlp.translation import Translator
@@ -109,7 +121,7 @@ translated = Translator.translate(text, target_lang="fr")
 print("French Translation:", translated)
 ```
 
-### Batch Process Documents
+### [Batch Process](./src/utils/) Documents
 
 ```py
 from src.utils.file_utils import list_files
@@ -119,18 +131,6 @@ files = list_files("path/to/legal_docs", extensions=[".pdf", ".docx"])
 for file_path in files:
     result = extract_document(file_path)
     print(f"{file_path}: {result['document_type']} ({result['jurisdiction']})")
-```
-
-3. Alternatively, use `Kite` [CLI](./src/cli.py).
-
-```console
-$ python3 -m src.cli path/to/legal_document.docx --lang en --translate-to fr
-```
-
-4. Or run the `Kite` [Flask API server](./src/api.py).
-
-```console
-$ python3 -m src.api
 ```
 
 ## Architecture
