@@ -1,0 +1,38 @@
+jurisdiction: Malaysia
+document_types:
+  contract:
+    required_fields:
+      - party_names
+      - signatures
+      - effective_date
+      - governing_law
+    risk_flags:
+      - missing_signatures
+      - outdated_clauses
+      - missing_governing_law
+  court_decision:
+    required_fields:
+      - case_number
+      - judge
+      - decision_date
+      - territorial_jurisdiction
+    risk_flags:
+      - missing_case_number
+      - unclear_territorial_jurisdiction
+  kyc_document:
+    required_fields:
+      - client_name
+      - id_number
+      - date_of_birth
+      - proof_of_address
+      - source_of_funds
+    risk_flags:
+      - missing_kyc_documents
+languages:
+  - en
+  - ms
+  - zh
+notes: >
+  Malaysia’s legal system blends common law and Islamic law.
+  Territorial jurisdiction is critical due to separate High Courts in Malaya and Sabah/Sarawak.
+  AML/KYC compliance documents are important for risk flagging.

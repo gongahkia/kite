@@ -1,0 +1,36 @@
+jurisdiction: Singapore
+document_types:
+  contract:
+    required_fields:
+      - party_names
+      - signatures
+      - effective_date
+      - governing_law
+    risk_flags:
+      - missing_signatures
+      - outdated_clauses
+      - missing_governing_law
+  court_decision:
+    required_fields:
+      - case_number
+      - judge
+      - decision_date
+      - jurisdictional_basis
+    risk_flags:
+      - missing_case_number
+      - insufficient_jurisdictional_basis
+  statute:
+    required_fields:
+      - statute_number
+      - enactment_date
+      - authority
+    risk_flags:
+      - missing_statute_number
+languages:
+  - en
+  - zh
+  - ms
+  - ta
+notes: >
+  Singapore has a hybrid legal system with common law roots and statutory legislation.
+  Jurisdictional basis for court decisions is important as per Rules of Court 2021.

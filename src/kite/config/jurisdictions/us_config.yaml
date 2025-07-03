@@ -17,3 +17,9 @@ document_types:
       - missing_case_number
 languages:
   - en
+notes: >
+  The United States operates under a federal common law system with 
+  significant state-level legal variation. Contracts and court decisions 
+  often require explicit party identification, signatures, and effective 
+  dates. Risk flagging is important for missing signatures and outdated 
+  clauses, especially due to frequent regulatory updates.
