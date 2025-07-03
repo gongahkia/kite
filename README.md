@@ -23,24 +23,23 @@ It serves [Jurisdiction-aware](#coverage) [OCR](https://en.wikipedia.org/wiki/Op
 
 ## Coverage
 
-`Kite`'s [jurisdiction-aware extraction](https://dictionary.cambridge.org/dictionary/english/jurisdiction) currently supports the following regions.
-
-* United States (US)
-* European Union (EU)
-* Singapore
-* India
-* Malaysia
-* United Kingdom (UK)
-* France
-* Germany
-* China
-* Japan
-* Brazil
-
 > [!NOTE]  
 > Each jurisdiction's configuration includes document types such as contracts, court decisions, statutes, and other relevant legal documents which can be viewed [here](./src/config/jurisdictions/). 
 >  
 > To get your jurisdiction **added** or to **suggest an edit** an existing jurisdiction, please [open an issue](https://github.com/gongahkia/kite/issues).
+
+`Kite`'s [jurisdiction-aware extraction](https://dictionary.cambridge.org/dictionary/english/jurisdiction) currently supports the following regions.
+
+* [United States](./src/config/jurisdictions/us_config.yaml)
+* [European Union](./src/config/jurisdictions/eu_config.yaml)
+* [Singapore](./src/config/jurisdictions/sg_config.yaml)
+* [Malaysia](./src/config/jurisdictions/ms_config.yaml)
+* [United Kingdom](./src/config/jurisdictions/uk_config.yaml)
+* [France](./src/config/jurisdictions/fr_config.yaml)
+* [Germany](./src/config/jurisdictions/de_config.yaml)
+* [China](./src/config/jurisdictions/cn_config.yaml)
+* [Japan](./src/config/jurisdictions/jp_config.yaml)
+* [Brazil](./src/config/jurisdictions/br_config.yaml)
 
 ## Usage
 
