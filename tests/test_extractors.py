@@ -37,6 +37,7 @@ class TestExtractors(unittest.TestCase):
         self.assertEqual(jurisdiction, 'SG')
         jurisdiction = extractor.detect_jurisdiction({}, 'Other text')
         self.assertEqual(jurisdiction, None)
+        
 
 if __name__ == '__main__':
     unittest.main()
