@@ -8,12 +8,21 @@ It serves [Jurisdiction](https://dictionary.cambridge.org/dictionary/english/jur
   
 ## Stack
 
-* *Script*: [Python]()
-    * 
-    * 
-* *API*: 
-* *Package*: [Docker]()
-* *Testing*: []()
+* *Script*: [Python](https://www.python.org/)
+    * [PyMuPDF](https://pymupdf.readthedocs.io/en/latest/)
+    * [python-docx](https://python-docx.readthedocs.io/en/latest/)
+    * [pytesseract](https://pypi.org/project/pytesseract/)
+    * [Pillow](https://pillow.readthedocs.io/en/stable/)
+    * [spaCy](https://spacy.io/)
+    * [googletrans](https://py-googletrans.readthedocs.io/en/latest/)
+    * [PyYAML](https://pyyaml.org/)
+* *API*: [Flask](https://flask.palletsprojects.com/en/stable/)
+* *Package*: [Docker](https://www.docker.com/)
+* *Testing*: [pytest](https://docs.pytest.org/en/stable/), [pre-commit](https://pre-commit.com/)
+    * [isort](https://pycqa.github.io/isort/) 
+    * [black](https://pypi.org/project/black/)
+    * [flake8](https://flake8.pycqa.org/en/latest/)
+* *CI/CD*: [GitHub Actions](https://github.com/features/actions)
 
 ## Coverage
 
