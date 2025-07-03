@@ -3,7 +3,7 @@
 
 # `Kite` 🪄
 
-`Kite` is an all-in-one Python Library designed for [legal technologists](https://www.thomsonreuters.com/en-us/posts/technology/generalist-legal-technologist/) and [tinkerers](tinkerers).
+`Kite` is an [all-in-one](#architecture) Python Library designed for [legal technologists](https://www.thomsonreuters.com/en-us/posts/technology/generalist-legal-technologist/) and [tinkerers](tinkerers).
   
 It serves [Jurisdiction-aware](#coverage) [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition) with Multi-language [Translation](https://academic.oup.com/book/2473/chapter/142746439), [Document Classification](https://en.wikipedia.org/wiki/Document_classification), [Compliance Flagging](https://acd.mlaw.gov.sg/compliance/red-flag-indicators/) and [Extensible Extraction Rulesets](https://docs.stoplight.io/docs/spectral/83527ef2dd8c0-extending-rulesets).
   
