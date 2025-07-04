@@ -1,6 +1,9 @@
 [![](https://img.shields.io/badge/kite_1.0.0-passing-green)](https://github.com/gongahkia/kite/releases/tag/1.0.0) 
 ![](https://github.com/gongahkia/kite/actions/workflows/ci-cd.yml/badge.svg)
 
+> [!WARNING]  
+> [`Kite`](https://github.com/gongahkia/kite)'s Github Repository is no longer being actively maintained as of 4 July 2025.  
+
 # `Kite` 🪄
 
 `Kite` is an [all-in-one](#architecture) Python Library designed for [legal technologists](https://www.thomsonreuters.com/en-us/posts/technology/generalist-legal-technologist/) and [tinkerers](tinkerers).
