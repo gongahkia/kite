@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  kite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kite:dev
+    volumes:
+      - ./kite:/app/kite:ro
+      - ./tests:/app/tests:ro
+    environment:
+      - METRICS_PORT=8000
+      - LOG_LEVEL=DEBUG
+    ports:
+      - "8000:8000"
+    command: ["--help"]
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./deployment/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - kite-network
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./deployment/grafana:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - kite-network
+    depends_on:
+      - prometheus
+
+networks:
+  kite-network:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:
