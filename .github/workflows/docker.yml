@@ -1,0 +1,16 @@
+name: Docker
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build Docker image
+      run: docker build -t kite:latest .
+    - name: Test Docker image
+      run: docker run --rm kite:latest --version
