@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kite
+  namespace: kite
+  labels:
+    app: kite
+    version: v3-nim
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: kite
+  template:
+    metadata:
+      labels:
+        app: kite
+        version: v3-nim
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      
+      containers:
+      - name: kite
+        image: kite:nim
+        imagePullPolicy: IfNotPresent
+        args: ["list-scrapers"]
+        env:
+          - name: METRICS_PORT
+            value: "8000"
+          - name: METRICS_PATH
+            value: "/metrics"
+          - name: ENABLE_METRICS
+            value: "true"
+          - name: LOG_LEVEL
+            value: "INFO"
+        ports:
+          - containerPort: 8000
+            name: metrics
+        
+        envFrom:
+        - configMapRef:
+            name: kite-config
+        - secretRef:
+            name: kite-secrets
+        
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        livenessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import sys; sys.exit(0)"
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import sys; sys.exit(0)"
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: data
+          mountPath: /app/data
+      
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: data
+        emptyDir: {}
+      
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+

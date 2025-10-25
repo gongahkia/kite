@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # Main application service
+  kite:
+    # v3 (Nim) image
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kite:nim
+    command: ["/app/kite", "list-scrapers"]
+    environment:
+      - METRICS_PORT=8000
+      - METRICS_PATH=/metrics
+      - ENABLE_METRICS=true
+      - LOG_LEVEL=INFO
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: kite-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./deployment/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - kite-network
+    restart: unless-stopped
+
+  # Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: kite-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./deployment/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./deployment/grafana/datasources:/etc/grafana/provisioning/datasources
+      - grafana-data:/var/lib/grafana
+    networks:
+      - kite-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # Metrics exporter for the application
+  metrics-exporter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kite:nim
+    container_name: kite-metrics
+    environment:
+      - PYTHON_ENV=production
+      - LOG_LEVEL=INFO
+      - METRICS_PORT=8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - kite-network
+    command: python -m kite.utils.metrics_server
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  kite-network:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:
+

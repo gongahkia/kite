@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kite-config
+  namespace: kite
+  labels:
+    app: kite
+data:
+  # Application configuration
+  PYTHON_ENV: "production"
+  LOG_LEVEL: "INFO"
+  RATE_LIMIT: "1.0"
+  REQUEST_TIMEOUT: "30"
+  MAX_RETRIES: "3"
+  
+  # Metrics configuration
+  METRICS_PORT: "8000"
+  METRICS_PATH: "/metrics"
+  
+  # Observability
+  ENABLE_TRACING: "true"
+  ENABLE_METRICS: "true"
+
