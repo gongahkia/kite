@@ -1,800 +1,1264 @@
-# Kite Legal Case Law Scraper - Strategic Improvement Roadmap
-# ======================================================================
-# Generated: 2025-12-06
-# Updated: 2025-12-16
-# Focus: Practitioner-centric enhancements for legal industry adoption
-# Philosophy: Aligned with Kite's observability-first, production-ready approach
+# Kite v4 - Golang Implementation Roadmap
+# ========================================
+# Generated: 2025-12-16
+# Target: v4.0.0
+# Language: Go 1.22+
+# Architecture: API-first, backend service with extensibility
+# Philosophy: Production-ready, observable, extensible legal case law platform
 
 ## EXECUTIVE SUMMARY
 ## =================
-# Kite is a well-architected legal case law scraping library with strong foundations:
-# - Clean architecture with base scraper pattern
-# - Production-ready observability (Prometheus metrics, structured logging)
-# - Multi-jurisdiction support (17+ jurisdictions)
-# - Python implementation (v2.0.0) - ACTIVE
-# - Nim implementation (v3.0.0) - ARCHIVED
-# - Docker/K8s deployment ready
+# Kite v4 represents a complete reimagining as a backend-first API service written in Go,
+# synthesizing the best features from v1 (Python), v2 (Python production), and v3 (Nim).
 #
-# This roadmap tracks high-value improvements that will drive adoption by:
-# - Legal practitioners and law firms
-# - Legal tech companies
-# - Academic researchers
-# - Government legal departments
-# - Pro bono and public interest organizations
+# Core Design Principles:
+# - API-FIRST: RESTful + gRPC interfaces for all functionality
+# - DISTRIBUTED: Worker-based scraping architecture with job queues
+# - EXTENSIBLE: Middleware chains, event system, plugin architecture
+# - OBSERVABLE: Prometheus metrics, structured logging, distributed tracing
+# - PERFORMANT: Go concurrency primitives, efficient memory usage
+# - STORAGE-AGNOSTIC: Adapter pattern for databases, caching, queues
+# - SCALABLE: Small-medium deployments with horizontal scaling capability
+#
+# Target Deployment: 
+# - Single binary deployment for simplicity
+# - Docker + Kubernetes ready
+# - Microservice-friendly with gRPC
+# - Small-medium scale (1-10 nodes)
 
-## IMPLEMENTATION STATUS (as of 2025-12-16)
-## =========================================
-# ✅ COMPLETED:
-# - Citation Extraction Engine (regex-based, multi-jurisdiction)
-# - Citation Validation and Network Analysis
-# - Data Validation Framework (Pydantic models, quality metrics)
-# - Ethical Scraping Compliance (robots.txt, policies, attribution)
-# - Jurisdiction Metadata Enrichment (court hierarchy, case types)
-# - Legal Concept Tagging (keyword-based, 200+ concepts)
-# - PyPI Publishing Setup (LICENSE, workflows, verification)
-# - CI/CD Pipeline (testing, linting, security scans)
+## VERSION HISTORY SYNTHESIS
+## ==========================
+# v1 (Python): Initial scrapers, multi-jurisdiction support, CLI
+# v2 (Python): Production features - observability, validation, ethical scraping, 
+#              citation extraction, legal concepts, K8s deployment
+# v3 (Nim): Performance focus, static binary, fast startup
+# v4 (Go): API-first backend service with distributed architecture
 
-## CRITICAL: Legal Domain-Specific Features
-## =========================================
-# These features address actual legal research workflows and pain points
+## TECHNOLOGY STACK
+## =================
 
-[✅] Citation Extraction and Standardization Engine - COMPLETED 2025-12-16
-    - ✅ Regex patterns for US, UK, Canada, Australia, EU, International
-    - ✅ Automatic extraction from case text
-    - ✅ Citation validation and format checking
-    - ✅ Deduplication and normalization
-    - ✅ Bidirectional citation graphs
-    - ✅ Citation network analysis (authority/hub scores)
-    - 📁 Files: citation_patterns.py, citation_extractor.py, citation_validator.py, citation_network.py
-    - TODO: Add NLP-based citation disambiguation
-    - TODO: Track citation trends over time
+### Core Language & Runtime
+- Go 1.22+ (generics, improved performance, enhanced concurrency)
+- Standard library focus (net/http, context, sync, channels)
 
-[✅] Legal Concept Extraction and Tagging - BASIC IMPLEMENTATION 2025-12-16
-    - ✅ Keyword-based extraction (200+ concepts)
-    - ✅ Hierarchical taxonomy (10+ categories)
-    - ✅ Confidence scoring
-    - ✅ Area of law detection
-    - ✅ Legal issues extraction
-    - 📁 File: legal_concepts.py
-    - TODO: Add NLP/ML-based concept extraction
-    - TODO: Expand to statutory and constitutional provisions
-    - TODO: Add legal doctrines database
-    - Tag cases with extracted concepts
-    - Enable search by legal concept
-    - Track evolution of legal concepts over time
-    - IMPORTANCE: How legal professionals actually think about cases
-    - IMPLEMENTATION: Combine NLP with legal ontologies (LegalRuleML, LKIF)
-    - BENEFIT: Semantic search, concept-based research
+### Web Framework & API
+- Fiber v2 (Express-inspired, high-performance HTTP framework)
+- gRPC + Protocol Buffers (inter-service communication)
+- GraphQL via gqlgen (optional advanced query interface)
+- OpenAPI 3.0 spec generation (automated docs)
 
-[✅] Jurisdiction-Specific Metadata Enrichment - COMPLETED 2025-12-16
-    - ✅ Court hierarchy (5-level system for major jurisdictions)
-    - ✅ Court level determination (supreme, appellate, trial, etc.)
-    - ✅ Court type detection
-    - ✅ Court division extraction
-    - ✅ Case type classification (civil, criminal, family, etc.)
-    - ✅ Procedural metadata (panel size, en banc, per curiam)
-    - 📁 File: jurisdiction_metadata.py
-    - TODO: Add disposition tracking (affirmed, reversed, remanded)
-    - TODO: Implement precedential value classification
-    - TODO: Build case history linking
+### Scraping & Parsing
+- Colly v2 (elegant scraping framework with Go idioms)
+- goquery (jQuery-like HTML parsing)
+- chromedp (headless Chrome for JS-heavy sites)
+- net/http with custom transports for rate limiting
 
-[ ] Holding and Reasoning Extraction
-    - Use NLP to identify case holdings (ratio decidendi)
-    - Extract key reasoning passages
-    - Distinguish holdings from dicta
-    - Summarize reasoning chains
-    - Extract legal tests and factors applied
-    - IMPORTANCE: Core of what lawyers need from cases
-    - IMPLEMENTATION: Transformer models fine-tuned on legal text
-    - BENEFIT: Quick case understanding, better search relevance
+### Concurrency & Distribution
+- Go goroutines + channels (core concurrency)
+- errgroup for error propagation
+- context for cancellation and timeouts
+- Worker pool pattern for distributed scraping
+- NATS or Redis Streams for job queuing (storage-agnostic)
 
-[ ] Legal Issue Codification System
-    - Create standardized legal issue taxonomy
-    - Auto-tag cases with legal issues addressed
-    - Support multi-level issue classification:
-      * Area of law (contracts, torts, constitutional, etc.)
-      * Sub-area (employment contracts, medical malpractice, etc.)
-      * Specific issue (scope of liability, damages calculation, etc.)
-    - Enable issue-based case finding
-    - Track how issues are resolved across jurisdictions
-    - IMPORTANCE: How cases are indexed in legal databases
-    - IMPLEMENTATION: Supervised learning + legal taxonomy
-    - BENEFIT: Improved findability, comparative analysis
+### Observability
+- Prometheus client (metrics)
+- OpenTelemetry (distributed tracing)
+- zerolog or zap (structured logging)
+- pprof (profiling)
 
-[ ] Judge Analytics and Profiles
-    - Build comprehensive judge profiles:
-      * Judicial biography and background
-      * Cases authored
-      * Writing style analysis
-      * Decision patterns (liberal/conservative, plaintiff/defendant friendly)
-      * Reversal rates
-      * Citation patterns
-      * Frequently cited authorities
-      * Topic specialization
-    - Enable judge-based research
-    - Predict outcomes based on panel composition
-    - IMPORTANCE: Judge identity matters in legal analysis
-    - IMPLEMENTATION: Aggregate judge data across cases
-    - BENEFIT: Strategic litigation insights, outcome prediction
+### Data Processing
+- go-tagexpr (legal concept tagging)
+- regexp2 (advanced citation extraction)
+- go-nlp or prose (NLP for legal text analysis)
 
-## HIGH PRIORITY: Data Quality and Reliability
-## ============================================
-# Legal professionals need to trust the data implicitly
+### Storage Adapters (Optional/Pluggable)
+- PostgreSQL driver (pgx)
+- MongoDB driver
+- Redis client (go-redis)
+- SQLite for embedded deployments
+- S3-compatible storage for documents
 
-[✅] Comprehensive Data Validation Framework - COMPLETED 2025-12-16
-    - ✅ Pydantic models with type safety and enums
-    - ✅ Business rule validation (dates, case names, citations)
-    - ✅ Suspicious pattern detection (HTML tags, placeholders)
-    - ✅ Duplicate detection (hash-based and similarity matching)
-    - ✅ Completeness scoring (0-1 scale)
-    - ✅ Quality metrics (validation rate, field coverage, quality grades)
-    - ✅ Batch validation with aggregated statistics
-    - 📁 Files: validation_models.py, validation_pipeline.py, deduplication.py
-    - TODO: Add cross-reference validation (verify cited cases exist)
-    - TODO: Implement data quality dashboard UI
-    - TODO: Add confidence scoring per field
+### Configuration & Deployment
+- Viper (config management)
+- cobra (CLI for admin tasks)
+- Docker multi-stage builds
+- Kubernetes manifests
+- Single binary deployment
 
-[ ] Data Provenance and Audit Trail
-    - Track complete data lineage:
-      * Source URL and scraper version
-      * Scrape timestamp
-      * Data transformations applied
-      * Validation results
-      * Update history
-    - Cryptographic hashing for integrity verification
-    - Immutable audit log
-    - Export provenance metadata with cases
-    - IMPORTANCE: Legal defensibility, debugging, compliance
-    - IMPLEMENTATION: Blockchain-style audit trail
-    - BENEFIT: Trust, reproducibility, compliance
+### Testing & Quality
+- testify (testing framework)
+- gomock (mocking)
+- go-fuzz (fuzzing)
+- golangci-lint (comprehensive linting)
+- GitHub Actions (CI/CD)
 
-[ ] Automated Data Freshness Monitoring
-    - Monitor source websites for changes
-    - Detect when cases are updated or corrected
-    - Track when new cases are published
-    - Alert when scrapers break due to site changes
-    - Automatic re-scraping of stale data
-    - Data freshness dashboard
-    - IMPORTANCE: Legal accuracy requires current data
-    - IMPLEMENTATION: Change detection + scheduled checks
-    - BENEFIT: Always current data, proactive maintenance
+### Development Tools
+- air (hot reload)
+- make (build automation)
+- buf (Protocol Buffer management)
+- oapi-codegen (OpenAPI code generation)
 
-[ ] Cross-Jurisdiction Case Matching
-    - Identify same cases reported across jurisdictions
-    - Match related cases (appeals, remands, etc.)
-    - Link parallel citations
-    - Detect case name variations
-    - Build case relationship graph
-    - IMPORTANCE: Cases appear in multiple reporters
-    - IMPLEMENTATION: Fuzzy matching + citation resolution
-    - BENEFIT: Complete case view, no duplicates
-
-[ ] Data Quality Metrics Dashboard
-    - Real-time quality metrics:
-      * Scraping success rate by jurisdiction
-      * Data completeness scores
-      * Validation pass/fail rates
-      * Freshness indicators
-      * Coverage statistics
-    - Historical quality trends
-    - Quality SLA monitoring
-    - IMPORTANCE: Transparency builds trust
-    - IMPLEMENTATION: Extend Prometheus metrics
-    - BENEFIT: Visibility, continuous improvement
-
-## HIGH PRIORITY: Legal Research Workflow Integration
-## ==================================================
-# Make Kite fit seamlessly into how lawyers actually work
-
-[ ] Case Brief Generator
-    - Auto-generate structured case briefs:
-      * Case caption and citation
-      * Facts (procedural and substantive)
-      * Issues presented
-      * Holdings
-      * Reasoning
-      * Disposition
-    - Multiple brief formats (IRAC, FIRAC, CRAC)
-    - Customizable templates
-    - Export to Word/PDF with formatting
-    - IMPORTANCE: Briefing is core legal task
-    - IMPLEMENTATION: NLP summarization + templates
-    - BENEFIT: Massive time savings for lawyers
-
-[ ] Shepard's-Style Citator Service
-    - Track subsequent treatment of cases:
-      * Affirmed
-      * Reversed
-      * Distinguished
-      * Followed
-      * Criticized
-      * Overruled
-    - Identify negative treatment (red flags)
-    - Track citation depth (how often cited)
-    - Show citation context snippets
-    - IMPORTANCE: Essential for ensuring cases are still good law
-    - IMPLEMENTATION: Citation graph analysis + NLP
-    - BENEFIT: Competitive alternative to expensive citators
-
-[ ] Table of Authorities Generator
-    - Extract all authorities cited in a case
-    - Organize by type (cases, statutes, regulations, etc.)
-    - Format according to citation style
-    - Generate hyperlinked TOA
-    - Compare TOAs across cases
-    - IMPORTANCE: Required for legal briefs and research memos
-    - IMPLEMENTATION: Citation extraction + formatting
-    - BENEFIT: Automatic TOA generation
-
-[ ] Legal Research Export Formats
-    - Export to formats lawyers actually use:
-      * Word (.docx) with proper formatting
-      * Markdown with citations
-      * BibTeX for academic research
-      * EndNote/Zotero citation libraries
-      * Legal research memo templates
-      * Annotated case digests
-    - Maintain citation integrity in exports
-    - Support batch exports
-    - IMPORTANCE: Integration with writing workflow
-    - IMPLEMENTATION: Template engines + format converters
-    - BENEFIT: Seamless workflow integration
-
-[ ] Search Query Builder for Non-Programmers
-    - Visual query builder interface
-    - Natural language query support
-    - Boolean query builder (AND, OR, NOT)
-    - Date range pickers
-    - Court/jurisdiction selectors
-    - Save and share queries
-    - Query templates for common searches
-    - IMPORTANCE: Most lawyers aren't programmers
-    - IMPLEMENTATION: Web UI + query DSL
-    - BENEFIT: Broader adoption, easier use
-
-[ ] Case Alert and Monitoring System
-    - Monitor for new cases matching criteria:
-      * Specific legal issues
-      * Particular judges
-      * Specific parties (companies, entities)
-      * Citation of specific cases/statutes
-      * Keywords or concepts
-    - Email/Slack/webhook notifications
-    - Digest summaries (daily/weekly)
-    - RSS feed generation
-    - IMPORTANCE: Staying current is critical in law
-    - IMPLEMENTATION: Scheduled searches + notifications
-    - BENEFIT: Proactive awareness, competitive advantage
-
-## MEDIUM PRIORITY: Legal Tech Ecosystem Integration
-## =================================================
-# Make Kite a building block in the legal tech stack
-
-[ ] LexisNexis and Westlaw Import/Export
-    - Parse LexisNexis search results
-    - Parse Westlaw search results
-    - Convert between formats
-    - Deduplicate across platforms
-    - Compare coverage
-    - IMPORTANCE: Competitive analysis, migration support
-    - IMPLEMENTATION: Format parsers + converters
-    - BENEFIT: Interoperability with major platforms
-
-[ ] Practice Management System Integration
-    - Integrations with major legal practice management systems:
-      * Clio
-      * MyCase
-      * PracticePanther
-      * Smokeball
-    - Sync cases to matter files
-    - Link research to client matters
-    - Time tracking integration
-    - IMPORTANCE: Lawyers use PMS daily
-    - IMPLEMENTATION: API adapters for each system
-    - BENEFIT: Seamless workflow, better adoption
-
-[ ] Document Assembly Integration
-    - Integrate with document automation tools:
-      * HotDocs
-      * Contract Express
-      * Documate
-    - Populate templates with case data
-    - Insert citations automatically
-    - IMPORTANCE: Document assembly is common legal tech
-    - IMPLEMENTATION: Data connectors + mappings
-    - BENEFIT: End-to-end workflow automation
-
-[ ] E-Discovery Platform Integration
-    - Export to e-discovery platforms:
-      * Relativity
-      * Concordance
-      * Everlaw
-    - Format cases for review platforms
-    - Support load files
-    - IMPORTANCE: Large-scale litigation workflows
-    - IMPLEMENTATION: Platform-specific exporters
-    - BENEFIT: Enterprise adoption
-
-[ ] Legal AI/LLM Integration Layer
-    - Pre-built integrations for legal AI tools:
-      * OpenAI GPT models
-      * Anthropic Claude
-      * Legal-specific models (CaseText, Harvey)
-    - Case text preprocessing for LLMs
-    - Prompt templates for legal tasks
-    - RAG (Retrieval Augmented Generation) support
-    - Vector embedding generation
-    - Semantic search using embeddings
-    - IMPORTANCE: AI is transforming legal research
-    - IMPLEMENTATION: LLM adapters + embedding pipeline
-    - BENEFIT: Power next-gen legal AI tools
-
-[ ] Citation Management Tool Connectors
-    - Direct export to:
-      * Zotero
-      * Mendeley
-      * EndNote
-      * RefWorks
-    - Maintain citation metadata
-    - Support legal citation styles
-    - IMPORTANCE: Academic legal research
-    - IMPLEMENTATION: Format exporters
-    - BENEFIT: Academic researcher adoption
-
-## MEDIUM PRIORITY: Compliance and Ethical Features
-## ================================================
-# Address legal and ethical considerations
-
-[✅] Ethical Scraping Compliance Framework - COMPLETED 2025-12-16
-    - ✅ Automated robots.txt checking with caching
-    - ✅ Crawl delay detection and enforcement
-    - ✅ Jurisdiction-specific rate limiting (17 jurisdictions)
-    - ✅ Terms of Service tracking
-    - ✅ Attribution requirements per jurisdiction
-    - ✅ Commercial use and redistribution policies
-    - ✅ Automatic policy enforcement in BaseScraper
-    - ✅ Attribution helpers (text, HTML, markdown formats)
-    - 📁 Files: robots_checker.py, scraping_policy.py, attribution.py
-    - TODO: Add robots meta tag support
-    - TODO: Create legal opinion template
-    - TODO: Build compliance audit logging
-
-[ ] Public Domain and Copyright Verification
-    - Flag cases with copyright concerns
-    - Verify public domain status
-    - Track jurisdiction-specific copyright rules
-    - Attribution requirement tracking
-    - Copyright notice generation
-    - IMPORTANCE: Legal compliance, avoid infringement
-    - IMPLEMENTATION: Copyright database + rules engine
-    - BENEFIT: Safe, compliant usage
-
-[ ] Data Retention and Privacy Controls
-    - Configurable data retention policies
-    - GDPR-compliant data handling
-    - PII detection and redaction
-    - Right to erasure support
-    - Data minimization options
-    - Privacy impact assessment tool
-    - IMPORTANCE: Privacy regulations, data protection
-    - IMPLEMENTATION: Privacy controls + auditing
-    - BENEFIT: Regulatory compliance, user trust
-
-[ ] Usage Analytics and Transparency Reports
-    - Anonymous usage statistics
-    - Transparency reports (requests, compliance)
-    - Open data sharing policies
-    - Research use tracking
-    - Impact metrics
-    - IMPORTANCE: Trust, transparency, research value
-    - IMPLEMENTATION: Analytics + reporting
-    - BENEFIT: Community trust, impact visibility
-
-## MEDIUM PRIORITY: Academic and Research Features
-## ===============================================
-# Support legal scholarship and empirical research
-
-[ ] Empirical Legal Research Toolkit
-    - Statistical analysis helpers:
-      * Citation frequency analysis
-      * Outcome pattern detection
-      * Judge behavior analysis
-      * Temporal trend analysis
-      * Jurisdiction comparison tools
-    - Export to statistical software (R, Python pandas, Stata)
-    - Dataset creation for research
-    - Research reproducibility support
-    - IMPORTANCE: Growing field of empirical legal studies
-    - IMPLEMENTATION: Analysis utilities + exporters
-    - BENEFIT: Academic adoption, research citations
-
-[ ] Legal Network Analysis Tools
-    - Citation network generation
-    - Judge collaboration networks
-    - Law firm appearance networks
-    - Concept co-occurrence networks
-    - Network visualization (Gephi, Cytoscape export)
-    - Network metrics (centrality, clustering, etc.)
-    - IMPORTANCE: Network analysis is powerful research method
-    - IMPLEMENTATION: Graph generation + metrics
-    - BENEFIT: Novel research insights
-
-[ ] Corpus Linguistics for Legal Research
-    - Build legal corpora by jurisdiction
-    - Frequency analysis of legal terms
-    - Concordance generation
-    - Collocation analysis
-    - Diachronic analysis (language change over time)
-    - IMPORTANCE: Emerging method in legal interpretation
-    - IMPLEMENTATION: NLP corpus tools
-    - BENEFIT: Support for corpus-based legal arguments
-
-[ ] Legal Ontology and Knowledge Graph
-    - Build comprehensive legal knowledge graph:
-      * Cases linked by citations
-      * Statutes linked to interpretive cases
-      * Legal concepts and their relationships
-      * Judge-case-topic connections
-    - RDF/OWL export
-    - SPARQL query support
-    - Integrate with Wikidata, DBpedia
-    - IMPORTANCE: Semantic web in legal domain
-    - IMPLEMENTATION: Knowledge graph construction
-    - BENEFIT: Semantic reasoning, advanced queries
-
-[ ] Historical Legal Research Support
-    - Archive historical case versions
-    - Track precedent evolution
-    - Support historical legal research
-    - Temporal query capabilities
-    - Legal history timeline generation
-    - IMPORTANCE: Legal history scholarship
-    - IMPLEMENTATION: Versioning + temporal database
-    - BENEFIT: Historical research support
-
-## MEDIUM PRIORITY: Performance and Scale
-## ======================================
-# Handle large-scale production deployments
-
-[ ] Intelligent Caching Strategy
-    - Multi-tier caching:
-      * In-memory (LRU cache)
-      * Redis for distributed caching
-      * CDN for static content
-    - Cache warming for popular cases
-    - Predictive prefetching
-    - Cache hit rate optimization
-    - IMPORTANCE: Performance at scale
-    - IMPLEMENTATION: Caching infrastructure
-    - BENEFIT: Lower latency, reduced scraping load
-
-[ ] Horizontal Scaling Architecture
-    - Stateless scraper design
-    - Load balancing support
-    - Distributed work queue (Celery, RQ)
-    - Auto-scaling configuration
-    - Multi-region deployment
-    - IMPORTANCE: Enterprise-scale requirements
-    - IMPLEMENTATION: Distributed architecture
-    - BENEFIT: Handle high volume, reliability
-
-[ ] Incremental/Delta Scraping
-    - Only scrape new/changed cases
-    - Change detection algorithms
-    - Efficient update mechanism
-    - Minimize scraping overhead
-    - IMPORTANCE: Resource efficiency, faster updates
-    - IMPLEMENTATION: Change detection + differential updates
-    - BENEFIT: Lower cost, faster refreshes
-
-[ ] Scraping Priority Queue
-    - Prioritize important cases
-    - User-requested cases get priority
-    - Background bulk scraping
-    - Deadline-aware scheduling
-    - IMPORTANCE: Responsive to user needs
-    - IMPLEMENTATION: Priority queue + scheduler
-    - BENEFIT: Better user experience
-
-[ ] Database Optimization for Legal Data
-    - Specialized indexes for legal queries:
-      * Date range queries
-      * Citation lookups
-      * Full-text search
-      * Judge name searches
-    - Query optimization
-    - Partitioning by jurisdiction/date
-    - IMPORTANCE: Query performance at scale
-    - IMPLEMENTATION: Database tuning + indexing
-    - BENEFIT: Fast queries on large datasets
-
-## LOW PRIORITY: Advanced Features
-## ================================
-# Future-looking capabilities
-
-[ ] Predictive Case Outcome Modeling
-    - ML models to predict:
-      * Likelihood of reversal on appeal
-      * Settlement probability
-      * Expected damages ranges
-      * Judge voting behavior
-    - Feature engineering from case data
-    - Model transparency and explainability
-    - Regular model retraining
-    - IMPORTANCE: High-value strategic tool
-    - IMPLEMENTATION: ML pipeline + models
-    - BENEFIT: Strategic advantage, quantified risk
-
-[ ] Automated Legal Research Assistant
-    - Conversational interface for research
-    - Answer legal questions using case database
-    - Generate research memos
-    - Suggest relevant cases
-    - Multi-turn dialogue support
-    - IMPORTANCE: AI-powered legal assistance
-    - IMPLEMENTATION: LLM + RAG + fine-tuning
-    - BENEFIT: Democratize legal research
-
-[ ] Multi-Modal Case Analysis
-    - Extract data from:
-      * Scanned PDFs (OCR)
-      * Audio court recordings (speech-to-text)
-      * Video proceedings (video analysis)
-      * Court exhibits (image analysis)
-    - Multimodal search
-    - IMPORTANCE: Comprehensive case data
-    - IMPLEMENTATION: OCR, ASR, computer vision
-    - BENEFIT: Richer case data
-
-[ ] Real-Time Court Docket Monitoring
-    - Monitor court dockets for updates
-    - Track case progress
-    - Filing notifications
-    - Hearing alerts
-    - Outcome notifications
-    - IMPORTANCE: Timely awareness of case status
-    - IMPLEMENTATION: Docket scrapers + monitoring
-    - BENEFIT: Proactive case tracking
-
-[ ] Legal Trend Analysis Dashboard
-    - Visualize legal trends:
-      * Popular legal issues over time
-      * Citation patterns
-      * Judge statistics
-      * Jurisdiction comparisons
-    - Interactive dashboards
-    - Custom report generation
-    - IMPORTANCE: Strategic insights
-    - IMPLEMENTATION: Analytics + visualization
-    - BENEFIT: Market intelligence, research insights
-
-## BUSINESS AND COMMUNITY
+## ARCHITECTURE OVERVIEW
 ## ======================
-# Build sustainable project and community
 
-[ ] Freemium Business Model
-    - Free tier: Basic scraping, limited rate
-    - Pro tier: Enhanced features, higher limits
-    - Enterprise: White-label, SLA, support
-    - Academic: Free/discounted for researchers
-    - Pro bono: Free for public interest orgs
-    - IMPORTANCE: Sustainability, fairness
-    - IMPLEMENTATION: Tiered access + billing
-    - BENEFIT: Revenue to support development
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      API GATEWAY LAYER                        │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │   REST   │  │   gRPC   │  │ GraphQL  │  │ WebSocket│   │
+│  │   API    │  │   API    │  │   API    │  │  Events  │   │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
+│         │              │              │            │         │
+│         └──────────────┴──────────────┴────────────┘         │
+│                           │                                   │
+│                    [Middleware Chain]                         │
+│             Auth │ CORS │ Rate Limit │ Logging               │
+└───────────────────────────┼───────────────────────────────────┘
+                            │
+┌───────────────────────────┼───────────────────────────────────┐
+│                    SERVICE LAYER                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
+│  │  Scraper    │  │  Search     │  │  Analysis   │          │
+│  │  Service    │  │  Service    │  │  Service    │          │
+│  └─────────────┘  └─────────────┘  └─────────────┘          │
+│         │                 │                │                  │
+│         └─────────────────┴────────────────┘                  │
+│                           │                                   │
+│                    [Event Bus]                                │
+│        Scrape Started │ Complete │ Error │ Quality Check     │
+└───────────────────────────┼───────────────────────────────────┘
+                            │
+┌───────────────────────────┼───────────────────────────────────┐
+│                    WORKER LAYER                               │
+│  ┌─────────────────────────────────────────────────────┐     │
+│  │           Distributed Scraper Workers                │     │
+│  │  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐           │     │
+│  │  │Worker│  │Worker│  │Worker│  │Worker│  ...       │     │
+│  │  │  1   │  │  2   │  │  3   │  │  N   │           │     │
+│  │  └──────┘  └──────┘  └──────┘  └──────┘           │     │
+│  │      │          │          │          │             │     │
+│  │      └──────────┴──────────┴──────────┘             │     │
+│  │                    │                                 │     │
+│  │            [Job Queue - NATS/Redis]                  │     │
+│  └──────────────────────────────────────────────────────┘     │
+└───────────────────────────────────────────────────────────────┘
+                            │
+┌───────────────────────────┼───────────────────────────────────┐
+│                    ADAPTER LAYER                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
+│  │  Storage    │  │   Cache     │  │   Queue     │          │
+│  │  Adapter    │  │  Adapter    │  │  Adapter    │          │
+│  └─────────────┘  └─────────────┘  └─────────────┘          │
+│         │                 │                │                  │
+│  ┌──────┴──────┐   ┌──────┴──────┐  ┌──────┴──────┐         │
+│  │ PostgreSQL  │   │    Redis    │  │    NATS     │         │
+│  │  MongoDB    │   │   Memcached │  │  RabbitMQ   │         │
+│  │   SQLite    │   │  In-Memory  │  │  Channels   │         │
+│  └─────────────┘   └─────────────┘  └─────────────┘         │
+└───────────────────────────────────────────────────────────────┘
+```
 
-[ ] Legal Professional Advisory Board
-    - Recruit practicing lawyers as advisors
-    - Law firm partnerships
-    - Law school faculty advisors
-    - Legal tech experts
-    - Regular feedback sessions
-    - IMPORTANCE: Domain expertise, credibility
-    - IMPLEMENTATION: Advisory board structure
-    - BENEFIT: Better product-market fit
+## CORE FEATURES - PHASE 1 (MVP)
+## ==============================
 
-[ ] Open Legal Data Initiative
-    - Contribute to open legal data movement
-    - Partner with Free Law Project, LII
-    - Support open standards (LegalDocML, Akoma Ntoso)
-    - Open case database
-    - IMPORTANCE: Public good, ecosystem growth
-    - IMPLEMENTATION: Data sharing agreements
-    - BENEFIT: Impact, reputation, collaboration
+### [1] API Gateway & HTTP Server
+Priority: CRITICAL
+Timeline: Weeks 1-2
 
-[ ] Legal Tech Conference Presence
-    - Present at:
-      * ABA TECHSHOW
-      * LegalTech
-      * CodeX FutureLaw
-      * ILTA
-    - Workshops and demos
-    - Community building
-    - IMPORTANCE: Visibility, adoption, feedback
-    - IMPLEMENTATION: Conference participation
-    - BENEFIT: Community, partnerships, users
+Features:
+- Fiber-based REST API with versioned routes (/api/v1/...)
+- OpenAPI 3.0 specification auto-generation
+- Swagger UI for interactive documentation
+- Health check endpoints (/health, /ready, /metrics)
+- Graceful shutdown handling
+- Request/response logging
+- CORS middleware
+- Request ID tracking
+- Error handling with consistent JSON responses
+- Rate limiting per endpoint/IP
+- API key authentication
+- JWT token support
 
-[ ] Case Studies and Success Stories
-    - Document real-world usage:
-      * Law firm research efficiency gains
-      * Academic research publications
-      * Pro bono case support
-      * Government transparency projects
-    - ROI calculations
-    - Testimonials
-    - IMPORTANCE: Social proof, marketing
-    - IMPLEMENTATION: Case study program
-    - BENEFIT: Credibility, adoption
+Files:
+- cmd/kite-api/main.go (API server entry point)
+- internal/api/routes.go (route definitions)
+- internal/api/handlers/ (HTTP handlers)
+- internal/api/middleware/ (middleware chain)
+- internal/api/responses.go (response helpers)
+- api/openapi.yaml (OpenAPI spec)
 
-[ ] Legal Hackathons and Challenges
-    - Host legal tech hackathons
-    - Data science competitions on case data
-    - Research challenges
-    - Innovation prizes
-    - IMPORTANCE: Community engagement, innovation
-    - IMPLEMENTATION: Event organization
-    - BENEFIT: Community growth, innovation
+Go Features Used:
+- net/http with Fiber framework
+- context.Context for request lifecycle
+- Middleware pattern
+- Interface-based design for testability
 
-## INFRASTRUCTURE AND TOOLING (COMPLETED 2025-12-16)
-## ===================================================
-# Development infrastructure work completed
+### [2] Core Scraper Engine (Multi-Jurisdiction)
+Priority: CRITICAL
+Timeline: Weeks 2-4
 
-[✅] PyPI Publishing Setup - COMPLETED 2025-12-16
-    - ✅ MIT LICENSE file added
-    - ✅ PUBLISHING.md guide with step-by-step instructions
-    - ✅ GitHub Actions workflow for automated publishing
-    - ✅ TestPyPI and production PyPI configuration
-    - ✅ Version management and tagging workflow
-    - 📁 Files: LICENSE, PUBLISHING.md, .github/workflows/publish.yml
-    - Ready for: `python -m build` and `twine upload`
-    
-[✅] CI/CD Pipeline - COMPLETED 2025-12-16
-    - ✅ GitHub Actions workflow for continuous integration
-    - ✅ Matrix testing (Python 3.9, 3.10, 3.11, 3.12)
-    - ✅ Pre-commit hooks (black, isort, flake8, mypy, bandit)
-    - ✅ Security scanning with Bandit
-    - ✅ Type checking with mypy
-    - ✅ Automated testing on push and PR
-    - 📁 Files: .github/workflows/ci.yml, .pre-commit-config.yaml
-    - TODO: Add coverage reporting
-    - TODO: Add integration test suite
-    - TODO: Add Docker image building
+Features:
+- Base scraper interface (all scrapers implement)
+- Jurisdiction-specific scrapers (port from v2):
+  * CourtListener (US Federal/State)
+  * CanLII (Canada)
+  * BAILII (UK/Ireland)
+  * AustLII (Australia)
+  * HKLII (Hong Kong)
+  * + 12 more from v2
+- HTML parsing with goquery
+- Rate limiting per jurisdiction (respects robots.txt)
+- Retry logic with exponential backoff
+- Timeout handling via context
+- Error types (NetworkError, ParsingError, RateLimitError)
+- Scraping policy enforcement
+- User-agent rotation
+- Proxy support
 
-## IMPLEMENTATION PRIORITIES
-## =========================
+Files:
+- internal/scraper/base.go (base scraper interface)
+- internal/scraper/jurisdictions/ (per-jurisdiction scrapers)
+- internal/scraper/policy.go (scraping policies)
+- internal/scraper/robots.go (robots.txt checker)
+- internal/scraper/ratelimit.go (rate limiter)
+- pkg/models/case.go (case data model)
 
-IMMEDIATE (Next 3 months):
-1. ✅ Citation extraction engine - Core legal workflow value [DONE]
-2. ✅ Data validation framework - Essential for trust [DONE]
-3. Case brief generator - High-value lawyer productivity tool
-4. ✅ Ethical scraping compliance - Risk mitigation [DONE]
-5. LLM integration layer - Ride the AI wave
+Go Features Used:
+- Interface-based polymorphism
+- Goroutines for concurrent scraping
+- Channels for result streaming
+- context.Context for cancellation
+- sync.WaitGroup for coordination
+- time.Ticker for rate limiting
 
-SHORT TERM (3-6 months):
-1. Shepard's-style citator - Competitive differentiator
-2. Judge analytics - Unique insights
-3. ✅ Legal concept extraction - Semantic search foundation [BASIC VERSION DONE]
-4. Research export formats - Workflow integration
-5. Data quality dashboard - Transparency
+### [3] Job Queue & Worker System
+Priority: CRITICAL
+Timeline: Weeks 3-5
 
-MEDIUM TERM (6-12 months):
-1. Practice management integrations - Enterprise adoption
-2. Empirical research toolkit - Academic community
-3. Case alert system - User retention
-4. Knowledge graph - Advanced capabilities
-5. Horizontal scaling - Handle growth
+Features:
+- Job queue abstraction (adapter pattern)
+- NATS Streaming or Redis Streams backend
+- Worker pool with configurable size
+- Job priority levels (high, normal, low)
+- Job retry with backoff
+- Dead letter queue for failed jobs
+- Job status tracking (pending, running, completed, failed)
+- Worker health monitoring
+- Graceful worker shutdown
+- Job metrics (throughput, latency, errors)
 
-LONG TERM (12+ months):
-1. Predictive modeling - Advanced analytics
-2. Real-time docket monitoring - Comprehensive coverage
-3. Multi-modal analysis - Cutting edge
-4. Legal research assistant - AI-powered future
-5. Open legal data initiative - Ecosystem leadership
+Files:
+- internal/queue/interface.go (queue adapter interface)
+- internal/queue/nats.go (NATS implementation)
+- internal/queue/redis.go (Redis implementation)
+- internal/worker/pool.go (worker pool)
+- internal/worker/worker.go (individual worker)
+- internal/jobs/types.go (job definitions)
+
+Go Features Used:
+- Worker pool pattern with goroutines
+- Channels for job distribution
+- select statements for multiplexing
+- context.Context for cancellation
+- Interface-based adapters
+
+### [4] Data Models & Validation
+Priority: CRITICAL
+Timeline: Week 2
+
+Features:
+- Case data model with validation tags
+- Judge data model
+- Citation data model
+- Legal concept taxonomy
+- Validation using go-playground/validator
+- JSON serialization with custom tags
+- Enum types for case status, court levels, etc.
+- Timestamp handling (RFC3339)
+- URL validation
+- Date range validation
+
+Files:
+- pkg/models/case.go
+- pkg/models/judge.go
+- pkg/models/citation.go
+- pkg/models/concepts.go
+- pkg/validation/validator.go
+
+Go Features Used:
+- Struct tags for validation and serialization
+- Custom types for enums
+- time.Time for timestamps
+- json.Marshal/Unmarshal
+
+### [5] Observability Foundation
+Priority: HIGH
+Timeline: Week 3
+
+Features:
+- Prometheus metrics endpoint (/metrics)
+- Structured logging with zerolog
+- Request tracing with trace IDs
+- Metrics for:
+  * HTTP request duration
+  * Scraping success/failure rates
+  * Job queue depth
+  * Worker utilization
+  * Cache hit rates
+- Log levels (debug, info, warn, error)
+- Contextual logging (request ID, user ID, etc.)
+- Performance profiling endpoints (pprof)
+
+Files:
+- internal/observability/metrics.go
+- internal/observability/logging.go
+- internal/observability/tracing.go
+- internal/middleware/logging.go
+- internal/middleware/metrics.go
+
+Go Features Used:
+- prometheus/client_golang
+- zerolog structured logging
+- net/http/pprof for profiling
+- Middleware pattern
+
+## CORE FEATURES - PHASE 2 (Enhanced)
+## ====================================
+
+### [6] gRPC API Interface
+Priority: HIGH
+Timeline: Weeks 5-6
+
+Features:
+- Protocol Buffer definitions for all services
+- gRPC server alongside HTTP server
+- Streaming support for long-running scrapes
+- Bidirectional streaming for real-time updates
+- gRPC middleware (auth, logging, recovery)
+- gRPC-gateway for REST-to-gRPC translation
+- Service definitions:
+  * ScraperService (trigger scrapes, get status)
+  * SearchService (query cases)
+  * AnalysisService (citation networks, trends)
+
+Files:
+- api/proto/scraper.proto
+- api/proto/search.proto
+- api/proto/analysis.proto
+- internal/grpc/server.go
+- internal/grpc/services/ (service implementations)
+
+Go Features Used:
+- gRPC-go library
+- Context for request cancellation
+- Channels for streaming
+- Protocol Buffers for serialization
+
+### [7] Middleware & Extensibility System
+Priority: HIGH
+Timeline: Week 4
+
+Features:
+- Middleware chain pattern
+- Built-in middleware:
+  * Authentication (API key, JWT)
+  * CORS
+  * Rate limiting
+  * Request logging
+  * Metrics collection
+  * Panic recovery
+  * Compression
+  * Request ID injection
+- Custom middleware registration
+- Middleware ordering control
+- Per-route middleware
+
+Files:
+- internal/middleware/chain.go
+- internal/middleware/auth.go
+- internal/middleware/ratelimit.go
+- internal/middleware/cors.go
+- internal/middleware/recovery.go
+
+Go Features Used:
+- Higher-order functions
+- Closure pattern
+- Interface-based middleware
+
+### [8] Event System & Webhooks
+Priority: HIGH
+Timeline: Week 5
+
+Features:
+- Event bus for internal events
+- Event types:
+  * ScrapeStarted
+  * ScrapeCompleted
+  * ScrapeFailed
+  * CaseValidated
+  * CitationExtracted
+  * QualityChecked
+- Event subscribers (handlers)
+- Async event processing
+- Webhook delivery for external systems
+- Webhook retry logic
+- Event persistence (optional)
+
+Files:
+- internal/events/bus.go
+- internal/events/types.go
+- internal/events/subscribers.go
+- internal/webhooks/delivery.go
+
+Go Features Used:
+- Channels for event pub/sub
+- Goroutines for async processing
+- Interface-based subscribers
+- select for event multiplexing
+
+### [9] Storage Adapter System
+Priority: MEDIUM
+Timeline: Week 6
+
+Features:
+- Storage interface (CRUD operations)
+- Adapter implementations:
+  * PostgreSQL (production)
+  * SQLite (development/embedded)
+  * MongoDB (document-oriented)
+  * In-memory (testing)
+- Query builder abstraction
+- Transaction support
+- Connection pooling
+- Migration system
+- Storage-agnostic repository pattern
+
+Files:
+- internal/storage/interface.go
+- internal/storage/postgres.go
+- internal/storage/sqlite.go
+- internal/storage/mongodb.go
+- internal/storage/memory.go
+- internal/repository/ (domain repositories)
+
+Go Features Used:
+- Interface-based adapters
+- Context for timeouts
+- database/sql for SQL databases
+- Generic types for reusable code
+
+### [10] Citation Extraction & Analysis
+Priority: HIGH (port from v2)
+Timeline: Weeks 6-7
+
+Features:
+- Multi-jurisdiction citation patterns (regex)
+- Citation extraction from case text
+- Citation validation
+- Citation normalization
+- Bidirectional citation graphs
+- Authority/hub score calculation
+- Citation network visualization data
+- Citation format detection (Bluebook, neutral, etc.)
+
+Files:
+- internal/citation/extractor.go
+- internal/citation/patterns.go
+- internal/citation/validator.go
+- internal/citation/network.go
+- pkg/models/citation.go
+
+Go Features Used:
+- regexp package with compiled patterns
+- Concurrent processing with goroutines
+- Graph algorithms
+- Map/reduce patterns
+
+## LEGAL DOMAIN FEATURES - PHASE 3
+## =================================
+
+### [11] Legal Concept Extraction & Tagging
+Priority: HIGH (port from v2)
+Timeline: Week 7
+
+Features:
+- Keyword-based concept extraction
+- Hierarchical taxonomy (200+ concepts)
+- Area of law detection
+- Legal issue classification
+- Confidence scoring
+- Concept co-occurrence analysis
+- Taxonomy updates via config
+
+Files:
+- internal/concepts/extractor.go
+- internal/concepts/taxonomy.go
+- internal/concepts/scorer.go
+- configs/legal-concepts.yaml
+
+Go Features Used:
+- Concurrent text processing
+- Trie data structures for keyword matching
+- YAML config parsing
+
+### [12] Jurisdiction Metadata Enrichment
+Priority: MEDIUM (port from v2)
+Timeline: Week 8
+
+Features:
+- Court hierarchy mapping (5-level system)
+- Court level determination
+- Court type detection
+- Case type classification
+- Procedural metadata extraction
+- Jurisdiction-specific rules
+
+Files:
+- internal/jurisdiction/metadata.go
+- internal/jurisdiction/hierarchy.go
+- configs/jurisdiction-rules.yaml
+
+### [13] Data Quality & Validation Pipeline
+Priority: HIGH (port from v2)
+Timeline: Week 8
+
+Features:
+- Multi-stage validation pipeline
+- Business rule validation
+- Duplicate detection (hash-based)
+- Completeness scoring
+- Quality metrics aggregation
+- Suspicious pattern detection
+- Validation reporting
+
+Files:
+- internal/validation/pipeline.go
+- internal/validation/rules.go
+- internal/validation/deduplication.go
+- internal/validation/scoring.go
+
+Go Features Used:
+- Pipeline pattern with channels
+- Worker pool for parallel validation
+- Crypto/hash for deduplication
+
+### [14] Ethical Scraping Compliance
+Priority: MEDIUM (port from v2)
+Timeline: Week 9
+
+Features:
+- robots.txt checking with caching
+- Crawl delay enforcement
+- Rate limiting per jurisdiction
+- Terms of Service tracking
+- Attribution requirement handling
+- Commercial use policy checking
+- Policy violation alerts
+
+Files:
+- internal/compliance/robots.go
+- internal/compliance/policy.go
+- internal/compliance/attribution.go
+- configs/scraping-policies.yaml
+
+### [15] Search & Query API
+Priority: HIGH
+Timeline: Weeks 9-10
+
+Features:
+- Full-text search (storage backend dependent)
+- Structured query DSL
+- Multi-field search (case name, judges, citations, concepts)
+- Date range filtering
+- Jurisdiction filtering
+- Relevance scoring
+- Pagination with cursor support
+- Faceted search
+- Query suggestions
+- Search history
+
+Files:
+- internal/search/engine.go
+- internal/search/query.go
+- internal/search/filters.go
+- internal/api/handlers/search.go
+
+Go Features Used:
+- Generic query builders
+- Concurrent search across sources
+- Context for timeouts
+
+## ADVANCED FEATURES - PHASE 4
+## =============================
+
+### [16] WebSocket Streaming API
+Priority: MEDIUM
+Timeline: Week 10
+
+Features:
+- Real-time scrape progress updates
+- Live search result streaming
+- Case monitoring alerts
+- Event subscriptions
+- Connection management
+- Heartbeat/ping-pong
+- Reconnection support
+
+Files:
+- internal/websocket/server.go
+- internal/websocket/hub.go
+- internal/websocket/client.go
+
+Go Features Used:
+- gorilla/websocket
+- Channels for message passing
+- Select for multiplexing
+
+### [17] GraphQL API (Optional)
+Priority: LOW
+Timeline: Week 11
+
+Features:
+- GraphQL schema for all resources
+- Query optimization (N+1 prevention)
+- Dataloader pattern
+- Subscriptions for real-time updates
+- GraphQL Playground
+
+Files:
+- api/graphql/schema.graphql
+- internal/graphql/resolvers.go
+- internal/graphql/dataloaders.go
+
+Go Features Used:
+- gqlgen code generation
+- Context for dataloader batching
+
+### [18] Caching Layer
+Priority: MEDIUM
+Timeline: Week 11
+
+Features:
+- Cache adapter interface
+- Redis implementation
+- In-memory implementation
+- Multi-tier caching (L1/L2)
+- Cache invalidation strategies
+- TTL support
+- Cache-aside pattern
+- Cache metrics
+
+Files:
+- internal/cache/interface.go
+- internal/cache/redis.go
+- internal/cache/memory.go
+- internal/cache/multilevel.go
+
+Go Features Used:
+- Interface-based adapters
+- sync.Map for in-memory cache
+- Generics for type-safe caching
+
+### [19] Batch Processing & Export
+Priority: MEDIUM
+Timeline: Week 12
+
+Features:
+- Batch scrape jobs
+- Bulk export (JSON, CSV, XML)
+- Export formats:
+  * JSON Lines
+  * CSV with custom fields
+  * Legal citation formats
+  * BibTeX
+  * Markdown
+- Streaming exports for large datasets
+- Compression (gzip)
+
+Files:
+- internal/batch/processor.go
+- internal/export/formats.go
+- internal/export/stream.go
+
+Go Features Used:
+- Channels for streaming
+- encoding/json, encoding/csv
+- compress/gzip
+- io.Pipe for streaming
+
+### [20] Admin CLI Tool
+Priority: MEDIUM
+Timeline: Week 12
+
+Features:
+- Database migrations
+- Worker management (start/stop)
+- Cache management (flush, stats)
+- Health checks
+- Configuration validation
+- Job queue inspection
+- Metrics queries
+
+Files:
+- cmd/kite-admin/main.go
+- internal/admin/commands/
+
+Go Features Used:
+- cobra for CLI
+- Viper for config
+
+### [21] Plugin System
+Priority: LOW
+Timeline: Week 13
+
+Features:
+- Plugin interface definition
+- Plugin discovery and loading
+- Custom scraper plugins
+- Custom processor plugins
+- Plugin lifecycle (init, start, stop)
+- Plugin configuration
+- Plugin sandboxing (optional)
+
+Files:
+- internal/plugins/interface.go
+- internal/plugins/loader.go
+- internal/plugins/registry.go
+
+Go Features Used:
+- plugin package (or hashicorp/go-plugin)
+- Interface-based plugins
+- Reflection for dynamic loading
+
+## DEPLOYMENT & OPERATIONS - PHASE 5
+## ===================================
+
+### [22] Configuration Management
+Priority: HIGH
+Timeline: Week 2
+
+Features:
+- Environment-based config (dev, staging, prod)
+- Config file support (YAML, JSON, TOML)
+- Environment variable overrides
+- Secret management (env vars, vault integration)
+- Config validation on startup
+- Hot reload for certain configs
+- Default values
+
+Files:
+- configs/default.yaml
+- configs/production.yaml
+- internal/config/loader.go
+- internal/config/validator.go
+
+Go Features Used:
+- Viper for config management
+- Struct tags for validation
+
+### [23] Docker & Kubernetes Deployment
+Priority: HIGH
+Timeline: Week 13
+
+Features:
+- Multi-stage Dockerfile for minimal images
+- Docker Compose for local development
+- Kubernetes manifests:
+  * Deployment (API + Workers)
+  * Service (LoadBalancer/NodePort)
+  * ConfigMap
+  * Secret
+  * HorizontalPodAutoscaler
+  * ServiceMonitor (Prometheus)
+- Helm chart (optional)
+- Health checks (liveness, readiness)
+
+Files:
+- Dockerfile
+- docker-compose.yaml
+- k8s/deployment.yaml
+- k8s/service.yaml
+- k8s/configmap.yaml
+- k8s/hpa.yaml
+
+### [24] CI/CD Pipeline
+Priority: HIGH
+Timeline: Week 13
+
+Features:
+- GitHub Actions workflows:
+  * Test on push/PR
+  * Lint (golangci-lint)
+  * Security scan (gosec, nancy)
+  * Build and push Docker images
+  * Deploy to staging
+  * Release automation
+- Pre-commit hooks
+- Test coverage reporting
+- Vulnerability scanning
+
+Files:
+- .github/workflows/ci.yaml
+- .github/workflows/release.yaml
+- .golangci.yaml
+- Makefile
+
+### [25] Monitoring & Alerting
+Priority: MEDIUM
+Timeline: Week 14
+
+Features:
+- Prometheus metrics scraping
+- Grafana dashboards:
+  * API performance
+  * Worker health
+  * Scraping success rates
+  * Queue metrics
+  * Error rates
+- Alert rules:
+  * High error rate
+  * Worker down
+  * Queue backup
+  * API latency
+- OpenTelemetry integration
+
+Files:
+- deployment/prometheus/rules.yaml
+- deployment/grafana/dashboards/
+- deployment/alertmanager/config.yaml
+
+## DOCUMENTATION - PHASE 6
+## ========================
+
+### [26] API Documentation
+Priority: HIGH
+Timeline: Ongoing
+
+Features:
+- OpenAPI/Swagger docs (auto-generated)
+- Godoc comments for all public APIs
+- API usage examples
+- Authentication guide
+- Rate limiting documentation
+- Error code reference
+
+Files:
+- docs/api/README.md
+- api/openapi.yaml (generated)
+
+### [27] Developer Guide
+Priority: MEDIUM
+Timeline: Week 14
+
+Features:
+- Architecture overview
+- Getting started guide
+- Local development setup
+- Testing guide
+- Contributing guidelines
+- Code style guide
+- Plugin development guide
+
+Files:
+- docs/ARCHITECTURE.md
+- docs/DEVELOPMENT.md
+- docs/CONTRIBUTING.md
+- CONTRIBUTING.md
+
+### [28] Operator Guide
+Priority: MEDIUM
+Timeline: Week 14
+
+Features:
+- Deployment guide
+- Configuration reference
+- Monitoring setup
+- Troubleshooting guide
+- Performance tuning
+- Backup and recovery
+
+Files:
+- docs/DEPLOYMENT.md
+- docs/OPERATIONS.md
+- docs/TROUBLESHOOTING.md
+
+## PROJECT STRUCTURE
+## ==================
+
+```
+kite/
+├── cmd/
+│   ├── kite-api/          # API server entry point
+│   │   └── main.go
+│   ├── kite-worker/       # Worker process entry point
+│   │   └── main.go
+│   └── kite-admin/        # Admin CLI tool
+│       └── main.go
+├── internal/              # Private application code
+│   ├── api/               # HTTP API layer
+│   │   ├── handlers/
+│   │   ├── middleware/
+│   │   └── routes.go
+│   ├── grpc/              # gRPC API layer
+│   │   ├── services/
+│   │   └── server.go
+│   ├── scraper/           # Scraping engine
+│   │   ├── base.go
+│   │   └── jurisdictions/
+│   ├── worker/            # Worker pool
+│   │   ├── pool.go
+│   │   └── worker.go
+│   ├── queue/             # Job queue abstraction
+│   │   ├── interface.go
+│   │   ├── nats.go
+│   │   └── redis.go
+│   ├── storage/           # Storage adapters
+│   │   ├── interface.go
+│   │   ├── postgres.go
+│   │   └── sqlite.go
+│   ├── cache/             # Caching layer
+│   ├── events/            # Event system
+│   ├── citation/          # Citation extraction
+│   ├── concepts/          # Legal concept tagging
+│   ├── validation/        # Data validation
+│   ├── search/            # Search engine
+│   ├── observability/     # Metrics, logging, tracing
+│   └── config/            # Configuration management
+├── pkg/                   # Public library code
+│   ├── models/            # Data models
+│   │   ├── case.go
+│   │   ├── citation.go
+│   │   └── judge.go
+│   ├── client/            # Go client library
+│   └── errors/            # Error types
+├── api/                   # API definitions
+│   ├── proto/             # Protocol Buffer definitions
+│   ├── openapi.yaml       # OpenAPI spec
+│   └── graphql/           # GraphQL schema
+├── configs/               # Configuration files
+│   ├── default.yaml
+│   ├── production.yaml
+│   └── legal-concepts.yaml
+├── deployment/            # Deployment manifests
+│   ├── docker/
+│   ├── k8s/
+│   ├── prometheus/
+│   └── grafana/
+├── scripts/               # Build and maintenance scripts
+│   ├── migrate.sh
+│   └── test.sh
+├── docs/                  # Documentation
+│   ├── ARCHITECTURE.md
+│   ├── API.md
+│   └── DEPLOYMENT.md
+├── test/                  # Integration tests
+│   ├── integration/
+│   └── e2e/
+├── Dockerfile
+├── docker-compose.yaml
+├── Makefile
+├── go.mod
+├── go.sum
+└── README.md
+```
+
+## GO-SPECIFIC OPTIMIZATIONS
+## ==========================
+
+### Concurrency Patterns
+- Worker pools for parallel scraping
+- Pipeline pattern for data processing
+- Fan-out/fan-in for distributed operations
+- Context-based cancellation throughout
+- Buffered channels for backpressure
+
+### Memory Optimization
+- Sync.Pool for reusable objects (HTTP clients, buffers)
+- Streaming processing for large datasets
+- Bounded goroutine pools
+- Proper resource cleanup with defer
+
+### Performance
+- HTTP client connection pooling
+- Rate limiting with token bucket algorithm
+- Batch processing where applicable
+- Efficient serialization (Protocol Buffers, msgpack)
+- Profile-guided optimization (PGO)
+
+### Error Handling
+- Typed errors with sentinel values
+- Error wrapping with context
+- Graceful degradation
+- Panic recovery in goroutines
+
+### Testing
+- Table-driven tests
+- Subtests for organization
+- Test fixtures and helpers
+- Mock interfaces with gomock
+- Benchmark tests
+- Integration tests with testcontainers
+
+## RETAINED FEATURES FROM v1-v3
+## =============================
+
+### From v1 (Python)
+✓ Multi-jurisdiction scraper architecture
+✓ CLI for direct usage (adapted to Go cobra)
+✓ 17+ jurisdiction support
+✓ Rate limiting per jurisdiction
+✓ Retry logic with backoff
+
+### From v2 (Python Production)
+✓ Citation extraction and network analysis
+✓ Legal concept tagging (200+ concepts)
+✓ Jurisdiction metadata enrichment
+✓ Data validation pipeline
+✓ Ethical scraping compliance (robots.txt, policies)
+✓ Prometheus metrics
+✓ Structured logging
+✓ Kubernetes deployment
+✓ Docker support
+✓ Grafana dashboards
+
+### From v3 (Nim)
+✓ Single binary deployment
+✓ Fast startup time
+✓ Low memory footprint
+✓ Performance focus
+✓ Simplified deployment
+
+## NEW FEATURES IN v4 (Golang)
+## ============================
+
+### API-First Design
+- RESTful API with OpenAPI spec
+- gRPC API for service-to-service
+- WebSocket for real-time updates
+- GraphQL (optional) for flexible queries
+
+### Distributed Architecture
+- Job queue with worker pools
+- Horizontal scaling support
+- Distributed scraping
+- Load balancing
+
+### Extensibility
+- Middleware chain pattern
+- Event system with webhooks
+- Plugin architecture
+- Storage adapters
+- Queue adapters
+- Cache adapters
+
+### Advanced Features
+- Real-time streaming
+- Batch processing
+- Advanced search DSL
+- Citation network analysis (enhanced)
+- Admin CLI tool
+- Hot configuration reload
+
+### Go-Specific Benefits
+- Superior concurrency with goroutines
+- Type safety with generics
+- Fast compilation
+- Easy cross-platform builds
+- Rich standard library
+- Excellent tooling
+
+## IMPLEMENTATION TIMELINE
+## ========================
+
+### Phase 1: MVP (Weeks 1-5)
+- API gateway with REST endpoints
+- Core scraper engine (multi-jurisdiction)
+- Job queue and worker system
+- Data models and validation
+- Basic observability
+
+### Phase 2: Enhanced (Weeks 5-10)
+- gRPC API
+- Middleware system
+- Event bus and webhooks
+- Storage adapters
+- Citation extraction
+- Search API
+
+### Phase 3: Legal Features (Weeks 7-10)
+- Legal concept extraction
+- Jurisdiction metadata
+- Data quality pipeline
+- Ethical scraping compliance
+
+### Phase 4: Advanced (Weeks 10-13)
+- WebSocket streaming
+- Caching layer
+- Batch processing
+- Admin CLI
+- Plugin system
+
+### Phase 5: Deployment (Weeks 13-14)
+- Docker and Kubernetes
+- CI/CD pipeline
+- Monitoring setup
+
+### Phase 6: Documentation (Week 14+)
+- API documentation
+- Developer guide
+- Operator guide
+
+Total Timeline: ~14-16 weeks for v4.0.0 release
+
+## MIGRATION STRATEGY
+## ===================
+
+### From v2 to v4
+- API compatibility layer for existing clients
+- Data migration scripts (Python → Go formats)
+- Feature parity checklist
+- Parallel running during transition
+- Gradual cutover
+
+### Client Migration
+- Provide Go client library
+- Maintain OpenAPI spec for code generation
+- Provide migration guide
+- Version API endpoints
 
 ## SUCCESS METRICS
-## ===============
+## ================
 
-Adoption Metrics:
-- Active law firms using Kite: Target 100 in year 1
-- Academic institutions: Target 50 in year 1
-- GitHub stars: Target 1000+ in year 1
-- PyPI downloads: Target 10k+/month in year 1
+### Performance
+- API latency p95 < 100ms
+- Scraping throughput: 10+ cases/second
+- Worker efficiency: >90% utilization
+- Memory usage: <500MB per worker
+- Startup time: <5 seconds
 
-Quality Metrics:
-- Data validation pass rate: >95%
-- Scraper uptime: >99%
-- Data freshness: <24hr lag
-- User-reported data errors: <0.1%
+### Reliability
+- API uptime: >99.5%
+- Scraper success rate: >95%
+- Zero data loss in queue
+- Graceful degradation
 
-Impact Metrics:
-- Academic papers citing Kite: Target 10+ in year 1
-- Pro bono cases supported: Track and report
-- Research hours saved: User surveys
-- Open legal data contributions: Measure
+### Scalability
+- Handle 100+ concurrent scraping jobs
+- Support 1000+ API requests/minute
+- Scale to 10 worker nodes
+- Process 10k+ cases/day
 
-Financial Metrics (if commercialized):
-- Annual recurring revenue: Target $100k year 1
-- Customer lifetime value: >$5k
-- Churn rate: <10% annually
-- Gross margin: >70%
+### Developer Experience
+- Setup time: <15 minutes
+- Test execution: <60 seconds
+- Build time: <30 seconds
+- Clear error messages
+
+## QUESTIONS & DECISIONS
+## ======================
+
+### Decided
+✓ Language: Go 1.22+
+✓ API-first architecture
+✓ Multi-jurisdiction scraper pattern
+✓ Distributed scraping with workers
+✓ Storage-agnostic design
+✓ Middleware + Event system + gRPC
+✓ Target: Small-medium deployments
+
+### To Decide
+- [ ] Default job queue: NATS or Redis Streams?
+- [ ] Default storage: PostgreSQL or embedded SQLite?
+- [ ] GraphQL: Include in v4.0 or later?
+- [ ] Plugin system: Priority for v4.0?
+- [ ] Licensing: MIT or Apache 2.0?
+
+### To Clarify
+- [ ] Authentication: API keys, JWT, OAuth2, or all?
+- [ ] Multi-tenancy: Support multiple organizations?
+- [ ] Data retention: Built-in policies or external?
+- [ ] Commercial features: Any premium features?
 
 ## RISK MITIGATION
-## ===============
+## ================
 
-Legal Risks:
-- Regular legal counsel review of scraping practices
-- Clear terms of service and acceptable use policy
-- Copyright compliance documentation
-- Liability insurance for production deployments
+### Technical Risks
+- Learning curve for Go: Mitigate with clear documentation
+- Scraper breakage: Automated tests, monitoring, alerts
+- Performance bottlenecks: Profiling, benchmarks, load testing
+- Data quality: Comprehensive validation, quality metrics
 
-Technical Risks:
-- Comprehensive test coverage (>80%)
-- Canary deployments for updates
-- Automated rollback on failures
-- Multi-region redundancy
+### Operational Risks
+- Deployment complexity: Docker/K8s abstracts complexity
+- Configuration errors: Validation on startup, sane defaults
+- Version compatibility: Semantic versioning, API versioning
 
-Business Risks:
-- Diversified jurisdiction coverage
-- Multiple revenue streams
-- Strong open-source community
-- Commercial support option
+### Legal Risks
+- Scraping legality: robots.txt compliance, ethical policies
+- Copyright: Attribution, terms tracking
+- Data privacy: No PII collection, GDPR awareness
 
-Reputational Risks:
-- Transparent data quality reporting
-- Rapid response to issues
-- Clear communication of limitations
-- Ethical scraping practices
+## GETTING STARTED (Post-Implementation)
+## ======================================
 
-## PHILOSOPHICAL ALIGNMENT
-## =======================
+### Quick Start
+```bash
+# Install
+go install github.com/gongahkia/kite/cmd/kite-api@latest
 
-This roadmap aligns with Kite's core philosophy:
+# Run API server
+kite-api serve --config configs/default.yaml
 
-1. PRACTITIONER-FOCUSED
-   - Every feature serves legal professionals' actual needs
-   - Workflow integration is priority
-   - Domain-specific solutions, not generic scraping
+# Run workers
+kite-worker start --workers 4
 
-2. OBSERVABILITY-FIRST
-   - Data quality metrics throughout
-   - Transparency in operation
-   - Audit trails and provenance
+# Access API
+curl http://localhost:8080/api/v1/health
+```
 
-3. PRODUCTION-READY
-   - Validation, testing, reliability
-   - Scale and performance considered
-   - Enterprise deployment support
+### Docker
+```bash
+docker-compose up -d
+```
 
-4. OPEN AND COLLABORATIVE
-   - Open legal data support
-   - Academic research enablement
-   - Community building emphasis
-
-5. ETHICAL AND COMPLIANT
-   - Responsible scraping practices
-   - Privacy and copyright respect
-   - Transparent operation
+### Kubernetes
+```bash
+kubectl apply -f k8s/
+```
 
 ## CONCLUSION
 ## ==========
 
-Kite has a strong foundation. These enhancements will transform it from
-a capable scraping library into an essential tool for the legal industry.
+Kite v4 represents a significant evolution from a Python library to a 
+production-grade, API-first backend service built with Go. By leveraging 
+Go's concurrency primitives, excellent standard library, and modern tooling, 
+v4 will deliver:
 
-The focus on legal domain expertise, data quality, and practitioner
-workflows will drive adoption where it matters: law firms, legal tech
-companies, academic researchers, and public interest organizations.
+1. **Performance**: 10x throughput vs. v2, sub-second API responses
+2. **Scalability**: Distributed workers, horizontal scaling
+3. **Extensibility**: Middleware, events, plugins, adapters
+4. **Reliability**: Type safety, robust error handling, comprehensive testing
+5. **Operability**: Single binary, Docker/K8s ready, excellent observability
 
-Success requires maintaining the clean architecture and production-ready
-mindset while adding features lawyers actually need. The roadmap balances
-immediate value (citation extraction, case briefs) with long-term vision
-(knowledge graphs, predictive analytics).
+The API-first design makes Kite a true backend service that can power 
+legal tech applications, research platforms, and custom integrations while 
+maintaining the legal domain expertise and data quality that made v1-v2 
+successful.
 
-Most importantly, this positions Kite as infrastructure for the legal
-tech ecosystem - not just another tool, but a foundational building block
-for the future of legal research and analysis.
+Key differentiators:
+- Native concurrency (goroutines) for efficient scraping
+- gRPC for language-agnostic integration
+- Event-driven architecture for extensibility
+- Storage-agnostic design for deployment flexibility
+- Production-ready from day one
+
+This roadmap synthesizes the best features from v1 (multi-jurisdiction), 
+v2 (legal domain expertise, observability), and v3 (performance focus) 
+while adding modern API patterns, distributed architecture, and Go's 
+unique strengths.
 
 ---
-# Generated by: Claude (Anthropic)
-# Date: 2025-12-06
-# For: Kite Legal Case Law Scraper
-# Repository: https://github.com/gongahkia/kite
+Generated: 2025-12-16
+Author: GitHub Copilot (Claude Sonnet 4.5)
+For: Kite Legal Case Law Scraper - v4 (Golang)
+Repository: https://github.com/gongahkia/kite
