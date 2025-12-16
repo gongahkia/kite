@@ -11,6 +11,15 @@ from .text_processing import clean_whitespace, remove_html_tags
 from .date_parser import parse_date, format_date
 from .json_utils import safe_json_loads, pretty_print_json
 from .env import get_env, get_env_bool, get_env_int
+from .robots_checker import RobotsChecker
+from .scraping_policy import ScrapingPolicy, get_policy, get_all_policies
+from .attribution import (
+    Attribution,
+    create_attribution,
+    get_attribution_text,
+    check_commercial_use_allowed,
+    check_redistribution_allowed,
+)
 
 __all__ = [
     "setup_session",
@@ -34,4 +43,13 @@ __all__ = [
     "get_env",
     "get_env_bool",
     "get_env_int",
+    "RobotsChecker",
+    "ScrapingPolicy",
+    "get_policy",
+    "get_all_policies",
+    "Attribution",
+    "create_attribution",
+    "get_attribution_text",
+    "check_commercial_use_allowed",
+    "check_redistribution_allowed",
 ]
