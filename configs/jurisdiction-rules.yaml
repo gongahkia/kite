@@ -1,0 +1,179 @@
+# Jurisdiction-specific rules and configurations
+# This file defines validation rules, citation patterns, and metadata requirements
+# for different legal jurisdictions supported by Kite
+
+jurisdictions:
+  - name: "United States"
+    citation_pattern: '\d+\s+[A-Z]\.?\s*\d+'
+    date_format: "2006-01-02"
+    required_fields:
+      - case_number
+      - court
+      - decision_date
+    court_abbreviations:
+      "SCOTUS": "Supreme Court of the United States"
+      "Circuit": "U.S. Court of Appeals"
+      "District": "U.S. District Court"
+    min_date: "1789-01-01"
+
+  - name: "United Kingdom"
+    citation_pattern: '\[\d{4}\]\s+[A-Z]+\s+\d+'
+    date_format: "2006-01-02"
+    required_fields:
+      - case_number
+      - court
+    court_abbreviations:
+      "UKSC": "UK Supreme Court"
+      "EWCA": "Court of Appeal (England & Wales)"
+      "EWHC": "High Court (England & Wales)"
+    min_date: "1875-01-01"
+
+  - name: "Canada"
+    citation_pattern: '\d{4}\s+[A-Z]+\s+\d+'
+    date_format: "2006-01-02"
+    required_fields:
+      - case_number
+      - court
+    court_abbreviations:
+      "SCC": "Supreme Court of Canada"
+      "FCA": "Federal Court of Appeal"
+      "FC": "Federal Court"
+    min_date: "1867-01-01"
+
+  - name: "Australia"
+    citation_pattern: '\[\d{4}\]\s+[A-Z]+\s+\d+'
+    date_format: "2006-01-02"
+    required_fields:
+      - case_number
+      - court
+    court_abbreviations:
+      "HCA": "High Court of Australia"
+      "FCA": "Federal Court of Australia"
+      "FCAFC": "Federal Court of Australia (Full Court)"
+    min_date: "1901-01-01"
+
+  - name: "Hong Kong"
+    citation_pattern: '\[\d{4}\]\s+HK[A-Z]+\s+\d+'
+    date_format: "2006-01-02"
+    required_fields:
+      - case_number
+      - court
+    court_abbreviations:
+      "HKCFA": "Court of Final Appeal"
+      "HKCA": "Court of Appeal"
+      "HKCFI": "Court of First Instance"
+    min_date: "1842-01-01"
+
+  - name: "India"
+    citation_pattern: '.*'
+    date_format: "02.01.2006"
+    required_fields:
+      - case_number
+    court_abbreviations:
+      "SCI": "Supreme Court of India"
+      "HC": "High Court"
+    min_date: "1950-01-26"
+
+  - name: "New Zealand"
+    citation_pattern: '\[\d{4}\]\s+NZ[A-Z]+\s+\d+'
+    date_format: "2006-01-02"
+    required_fields:
+      - case_number
+      - court
+    court_abbreviations:
+      "NZSC": "Supreme Court of New Zealand"
+      "NZCA": "Court of Appeal of New Zealand"
+      "NZHC": "High Court of New Zealand"
+    min_date: "1840-01-01"
+
+  - name: "South Africa"
+    citation_pattern: '\[\d{4}\]\s+ZA[A-Z]+\s+\d+'
+    date_format: "2006-01-02"
+    required_fields:
+      - case_number
+      - court
+    court_abbreviations:
+      "ZACC": "Constitutional Court of South Africa"
+      "ZASCA": "Supreme Court of Appeal of South Africa"
+    min_date: "1994-01-01"
+
+  - name: "Singapore"
+    citation_pattern: '\[\d{4}\]\s+SG[A-Z]+\s+\d+'
+    date_format: "2006-01-02"
+    required_fields:
+      - case_number
+      - court
+    court_abbreviations:
+      "SGCA": "Court of Appeal of Singapore"
+      "SGHC": "High Court of Singapore"
+      "SGDC": "District Court of Singapore"
+    min_date: "1965-01-01"
+
+  - name: "Ireland"
+    citation_pattern: '\[\d{4}\]\s+IE[A-Z]+\s+\d+'
+    date_format: "2006-01-02"
+    required_fields:
+      - case_number
+      - court
+    court_abbreviations:
+      "IESC": "Supreme Court of Ireland"
+      "IECA": "Court of Appeal of Ireland"
+      "IEHC": "High Court of Ireland"
+    min_date: "1922-01-01"
+
+# Court hierarchy levels (used for precedent determination)
+court_levels:
+  - level: supreme
+    precedential: true
+    description: "Highest court in jurisdiction, decisions bind all lower courts"
+
+  - level: appellate
+    precedential: true
+    description: "Intermediate appellate court, decisions bind trial courts"
+
+  - level: trial
+    precedential: false
+    description: "Trial court, decisions generally not precedential"
+
+  - level: lower
+    precedential: false
+    description: "Lower courts (magistrate, district), decisions not precedential"
+
+# Case type classifications
+case_types:
+  - name: "criminal"
+    keywords:
+      - criminal
+      - prosecution
+      - defendant
+      - guilty
+      - sentence
+      - conviction
+
+  - name: "civil"
+    keywords:
+      - plaintiff
+      - damages
+      - liability
+      - negligence
+
+  - name: "constitutional"
+    keywords:
+      - constitutional
+      - bill of rights
+      - charter
+      - fundamental rights
+
+  - name: "administrative"
+    keywords:
+      - administrative
+      - regulatory
+      - agency
+      - tribunal
+
+  - name: "commercial"
+    keywords:
+      - commercial
+      - business
+      - corporate
+      - contract
