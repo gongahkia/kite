@@ -1,0 +1,241 @@
+# Scraping Policies Configuration
+# Defines terms of service, attribution requirements, and usage policies
+# for legal databases supported by Kite
+
+policies:
+  - source_name: "CourtListener"
+    base_url: "https://www.courtlistener.com"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from CourtListener, a project of Free Law Project (https://www.courtlistener.com)"
+    commercial_use: "allowed"
+    rate_limit: 60  # requests per minute
+    crawl_delay: "1s"
+    terms_of_service_url: "https://www.courtlistener.com/terms/"
+    bulk_download: true
+    api_available: true
+    contact_email: "info@free.law"
+    restrictions:
+      - "Must credit Free Law Project in any publication or product"
+      - "API usage preferred over scraping"
+      - "Respect rate limits"
+
+  - source_name: "CanLII"
+    base_url: "https://www.canlii.org"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from CanLII (https://www.canlii.org)"
+    commercial_use: "allowed"
+    rate_limit: 30
+    crawl_delay: "2s"
+    terms_of_service_url: "https://www.canlii.org/en/info/terms.html"
+    bulk_download: false
+    api_available: true
+    contact_email: "info@canlii.org"
+    restrictions:
+      - "Must include proper legal citations"
+      - "API usage preferred for bulk access"
+      - "Non-commercial use preferred"
+
+  - source_name: "BAILII"
+    base_url: "https://www.bailii.org"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from BAILII (British and Irish Legal Information Institute) (https://www.bailii.org)"
+    commercial_use: "restricted"
+    rate_limit: 12
+    crawl_delay: "5s"
+    terms_of_service_url: "https://www.bailii.org/bailii/legal_policy.html"
+    bulk_download: false
+    api_available: false
+    restrictions:
+      - "Must credit BAILII in any use"
+      - "Commercial use requires explicit permission"
+      - "Moderate use only - no bulk downloading"
+      - "Respect robots.txt and crawl delays"
+
+  - source_name: "AustLII"
+    base_url: "https://www.austlii.edu.au"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from AustLII (Australasian Legal Information Institute) (https://www.austlii.edu.au)"
+    commercial_use: "restricted"
+    rate_limit: 12
+    crawl_delay: "5s"
+    terms_of_service_url: "https://www.austlii.edu.au/austlii/legal_policy.html"
+    bulk_download: false
+    api_available: false
+    restrictions:
+      - "Must credit AustLII and original source"
+      - "Non-commercial use preferred"
+      - "No systematic downloading"
+      - "Respect robots.txt"
+
+  - source_name: "HKLII"
+    base_url: "https://www.hklii.hk"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from HKLII (Hong Kong Legal Information Institute) (https://www.hklii.hk)"
+    commercial_use: "restricted"
+    rate_limit: 10
+    crawl_delay: "6s"
+    terms_of_service_url: "https://www.hklii.hk/legal_policy.html"
+    bulk_download: false
+    api_available: false
+    restrictions:
+      - "Must credit HKLII"
+      - "Moderate use only"
+      - "Respect robots.txt and rate limits"
+
+  - source_name: "NZLII"
+    base_url: "http://www.nzlii.org"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from NZLII (New Zealand Legal Information Institute) (http://www.nzlii.org)"
+    commercial_use: "restricted"
+    rate_limit: 12
+    crawl_delay: "5s"
+    bulk_download: false
+    api_available: false
+    restrictions:
+      - "Must credit NZLII"
+      - "Non-commercial use preferred"
+      - "Respect robots.txt"
+
+  - source_name: "SAFLII"
+    base_url: "https://www.saflii.org"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from SAFLII (Southern African Legal Information Institute) (https://www.saflii.org)"
+    commercial_use: "restricted"
+    rate_limit: 12
+    crawl_delay: "5s"
+    bulk_download: false
+    api_available: false
+    restrictions:
+      - "Must credit SAFLII"
+      - "Respect robots.txt"
+      - "No bulk downloading"
+
+  - source_name: "IndianKanoon"
+    base_url: "https://indiankanoon.org"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from Indian Kanoon (https://indiankanoon.org)"
+    commercial_use: "restricted"
+    rate_limit: 10
+    crawl_delay: "6s"
+    terms_of_service_url: "https://indiankanoon.org/terms.html"
+    bulk_download: false
+    api_available: false
+    contact_email: "contact@indiankanoon.org"
+    restrictions:
+      - "Moderate use only"
+      - "Must credit Indian Kanoon"
+      - "No systematic bulk downloading"
+      - "API or feed access may be available on request"
+
+  - source_name: "PacLII"
+    base_url: "http://www.paclii.org"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from PacLII (Pacific Islands Legal Information Institute) (http://www.paclii.org)"
+    commercial_use: "restricted"
+    rate_limit: 12
+    crawl_delay: "5s"
+    bulk_download: false
+    api_available: false
+    restrictions:
+      - "Must credit PacLII"
+      - "Respect robots.txt"
+
+  - source_name: "CommonLII"
+    base_url: "http://www.commonlii.org"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from CommonLII (Commonwealth Legal Information Institute) (http://www.commonlii.org)"
+    commercial_use: "restricted"
+    rate_limit: 12
+    crawl_delay: "5s"
+    bulk_download: false
+    api_available: false
+    restrictions:
+      - "Must credit CommonLII"
+      - "Respect robots.txt"
+
+  - source_name: "WorldLII"
+    base_url: "http://www.worldlii.org"
+    allow_scraping: true
+    requires_attribution: true
+    attribution_text: "Data sourced from WorldLII (World Legal Information Institute) (http://www.worldlii.org)"
+    commercial_use: "restricted"
+    rate_limit: 12
+    crawl_delay: "5s"
+    bulk_download: false
+    api_available: false
+    restrictions:
+      - "Must credit WorldLII"
+      - "Respect robots.txt"
+
+  - source_name: "SingaporeLawWatch"
+    base_url: "https://www.lawnet.sg"
+    allow_scraping: false  # Typically requires subscription
+    requires_attribution: true
+    attribution_text: "Data sourced from Singapore Law Watch"
+    commercial_use: "forbidden"
+    rate_limit: 5
+    crawl_delay: "10s"
+    bulk_download: false
+    api_available: false
+    restrictions:
+      - "Subscription required for access"
+      - "Scraping may violate terms of service"
+      - "Contact provider for API access"
+
+# General ethical scraping guidelines
+guidelines:
+  general:
+    - "Always respect robots.txt directives"
+    - "Implement polite crawling with appropriate delays"
+    - "Identify your bot with accurate User-Agent string"
+    - "Provide contact information in User-Agent or via email"
+    - "Respect rate limits and avoid overloading servers"
+    - "Cache responses to minimize repeated requests"
+    - "Handle errors gracefully and back off on failures"
+
+  attribution:
+    - "Always provide proper attribution when required"
+    - "Include source database name and URL"
+    - "Maintain original legal citations"
+    - "Preserve copyright and licensing information"
+
+  data_use:
+    - "Use data only for lawful purposes"
+    - "Respect commercial use restrictions"
+    - "Do not misrepresent the source of data"
+    - "Keep terms of service up to date"
+
+  technical:
+    - "Use HTTPS when available"
+    - "Respect HTTP status codes (429, 503, etc.)"
+    - "Implement exponential backoff for retries"
+    - "Monitor for blocking or CAPTCHAs"
+    - "Provide opt-out mechanisms for data subjects"
+
+# User agent template
+user_agent:
+  template: "Kite/{version} (Legal Research Bot; +{project_url}; {contact_email})"
+  version: "4.0"
+  project_url: "https://github.com/gongahkia/kite"
+  contact_email: "contact@kite-legal.org"
+
+# Monitoring and compliance
+monitoring:
+  check_policies_interval: "30d"  # Review policies every 30 days
+  log_violations: true
+  alert_on_violations: true
+  violation_severity_levels:
+    - "low"      # Minor guideline violations
+    - "medium"   # Rate limit violations
+    - "high"     # Terms of service violations
+    - "critical" # Legal/copyright violations
