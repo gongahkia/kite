@@ -182,43 +182,20 @@ Remaining:
 - API key authentication
 - JWT token support
 
-### [2] Core Scraper Engine (Multi-Jurisdiction)
+### ✅ [2] Core Scraper Engine (Multi-Jurisdiction) - PARTIALLY COMPLETED
 Priority: CRITICAL
-Timeline: Weeks 2-4
+Status: 🔄 PARTIAL (Base + 3 jurisdictions done)
 
-Features:
-- Base scraper interface (all scrapers implement)
-- Jurisdiction-specific scrapers (port from v2):
-  * CourtListener (US Federal/State)
-  * CanLII (Canada)
-  * BAILII (UK/Ireland)
-  * AustLII (Australia)
-  * HKLII (Hong Kong)
-  * + 12 more from v2
-- HTML parsing with goquery
-- Rate limiting per jurisdiction (respects robots.txt)
-- Retry logic with exponential backoff
-- Timeout handling via context
-- Error types (NetworkError, ParsingError, RateLimitError)
-- Scraping policy enforcement
-- User-agent rotation
-- Proxy support
+Completed:
+- ✅ Base scraper interface with rate limiting and robots.txt
+- ✅ CourtListener scraper (US Federal/State)
+- ✅ CanLII scraper (Canada)
+- ✅ BAILII scraper (UK/Ireland)
 
-Files:
-- internal/scraper/base.go (base scraper interface)
-- internal/scraper/jurisdictions/ (per-jurisdiction scrapers)
-- internal/scraper/policy.go (scraping policies)
-- internal/scraper/robots.go (robots.txt checker)
-- internal/scraper/ratelimit.go (rate limiter)
-- pkg/models/case.go (case data model)
-
-Go Features Used:
-- Interface-based polymorphism
-- Goroutines for concurrent scraping
-- Channels for result streaming
-- context.Context for cancellation
-- sync.WaitGroup for coordination
-- time.Ticker for rate limiting
+Remaining:
+- AustLII (Australia)
+- HKLII (Hong Kong)
+- + 12 more jurisdictions from v2
 
 ### ✅ [3] Job Queue & Worker System - COMPLETED
 Priority: CRITICAL
@@ -324,121 +301,60 @@ Go Features Used:
 - Closure pattern
 - Interface-based middleware
 
-### [8] Event System & Webhooks
+### ✅ [8] Event System & Webhooks - COMPLETED
 Priority: HIGH
-Timeline: Week 5
+Status: ✅ DONE
 
-Features:
-- Event bus for internal events
-- Event types:
-  * ScrapeStarted
-  * ScrapeCompleted
-  * ScrapeFailed
-  * CaseValidated
-  * CitationExtracted
-  * QualityChecked
-- Event subscribers (handlers)
-- Async event processing
-- Webhook delivery for external systems
-- Webhook retry logic
-- Event persistence (optional)
+Completed Features:
+- ✅ Event bus with pub/sub pattern
+- ✅ 15+ event types (scraping, validation, citations, quality, storage, workers)
+- ✅ Async event processing with goroutines
+- ✅ Webhook manager with retry logic and exponential backoff
+- ✅ Event filtering by type
+- ✅ Signature verification for webhook security
 
-Files:
-- internal/events/bus.go
-- internal/events/types.go
-- internal/events/subscribers.go
-- internal/webhooks/delivery.go
-
-Go Features Used:
-- Channels for event pub/sub
-- Goroutines for async processing
-- Interface-based subscribers
-- select for event multiplexing
-
-### [9] Storage Adapter System
+### ✅ [9] Storage Adapter System - PARTIALLY COMPLETED
 Priority: MEDIUM
-Timeline: Week 6
+Status: 🔄 PARTIAL
 
-Features:
-- Storage interface (CRUD operations)
-- Adapter implementations:
-  * PostgreSQL (production)
-  * SQLite (development/embedded)
-  * MongoDB (document-oriented)
-  * In-memory (testing)
-- Query builder abstraction
-- Transaction support
-- Connection pooling
+Completed:
+- ✅ Storage interface with CRUD operations
+- ✅ In-memory adapter (testing)
+- ✅ PostgreSQL adapter with connection pooling and auto-schema init
+
+Remaining:
+- SQLite adapter (development/embedded)
+- MongoDB adapter (document-oriented)
 - Migration system
-- Storage-agnostic repository pattern
+- Transaction support
 
-Files:
-- internal/storage/interface.go
-- internal/storage/postgres.go
-- internal/storage/sqlite.go
-- internal/storage/mongodb.go
-- internal/storage/memory.go
-- internal/repository/ (domain repositories)
+### ✅ [10] Citation Extraction & Analysis - COMPLETED
+Priority: HIGH
+Status: ✅ DONE
 
-Go Features Used:
-- Interface-based adapters
-- Context for timeouts
-- database/sql for SQL databases
-- Generic types for reusable code
-
-### [10] Citation Extraction & Analysis
-Priority: HIGH (port from v2)
-Timeline: Weeks 6-7
-
-Features:
-- Multi-jurisdiction citation patterns (regex)
-- Citation extraction from case text
-- Citation validation
-- Citation normalization
-- Bidirectional citation graphs
-- Authority/hub score calculation
-- Citation network visualization data
-- Citation format detection (Bluebook, neutral, etc.)
-
-Files:
-- internal/citation/extractor.go
-- internal/citation/patterns.go
-- internal/citation/validator.go
-- internal/citation/network.go
-- pkg/models/citation.go
-
-Go Features Used:
-- regexp package with compiled patterns
-- Concurrent processing with goroutines
-- Graph algorithms
-- Map/reduce patterns
+Completed Features:
+- ✅ Multi-jurisdiction citation patterns (Bluebook, Neutral, ECLI, Canadian, UK, Irish, Australian)
+- ✅ Citation extraction from case text with regex
+- ✅ Citation normalization and validation
+- ✅ Citation network builder with bidirectional graphs
+- ✅ PageRank-style influence score calculation
+- ✅ Citation chain finding (shortest path)
+- ✅ Network statistics and analysis
 
 ## LEGAL DOMAIN FEATURES - PHASE 3
 ## =================================
 
-### [11] Legal Concept Extraction & Tagging
-Priority: HIGH (port from v2)
-Timeline: Week 7
+### ✅ [11] Legal Concept Extraction & Tagging - COMPLETED
+Priority: HIGH
+Status: ✅ DONE
 
-Features:
-- Keyword-based concept extraction
-- Hierarchical taxonomy (200+ concepts)
-- Area of law detection
-- Legal issue classification
-- Confidence scoring
-- Concept co-occurrence analysis
-- Taxonomy updates via config
-
-Files:
-- internal/concepts/extractor.go
-- internal/concepts/taxonomy.go
-- internal/concepts/scorer.go
-- configs/legal-concepts.yaml
-
-Go Features Used:
-- Concurrent text processing
-- Trie data structures for keyword matching
-- YAML config parsing
+Completed Features:
+- ✅ Keyword-based concept extraction with confidence scoring
+- ✅ Hierarchical taxonomy with 30+ default concepts across 15 areas of law
+- ✅ Area of law detection and distribution analysis
+- ✅ Concurrent concept extraction from multiple texts
+- ✅ Top concept ranking by confidence
+- ✅ Related concept discovery
 
 ### [12] Jurisdiction Metadata Enrichment
 Priority: MEDIUM (port from v2)
