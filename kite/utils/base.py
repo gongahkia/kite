@@ -21,6 +21,8 @@ from .helpers import validate_date, sanitize_text
 from .logging_config import get_logger
 from .metrics import MetricsCollector
 from .config import get_config
+from .robots_checker import RobotsChecker
+from .scraping_policy import get_policy, ScrapingPolicy
 
 
 class BaseScraper(ABC):
@@ -42,6 +44,8 @@ class BaseScraper(ABC):
         max_retries: int = 3,
         retry_delay: float = 1.0,
         user_agent: str = None,
+        respect_robots_txt: bool = True,
+        use_policy: bool = True,
     ):
         """
         Initialize the base scraper.
@@ -52,18 +56,62 @@ class BaseScraper(ABC):
             max_retries: Maximum number of retry attempts
             retry_delay: Base delay between retries in seconds
             user_agent: Custom user agent string
+            respect_robots_txt: Whether to check and respect robots.txt
+            use_policy: Whether to apply jurisdiction-specific scraping policy
         """
+        # Try to load jurisdiction policy first
+        self.policy: Optional[ScrapingPolicy] = None
+        if use_policy:
+            try:
+                # Get scraper name from class (e.g., "CourtListenerScraper" -> "courtlistener")
+                scraper_key = self.__class__.__name__.replace("Scraper", "").lower()
+                # Handle special cases
+                if scraper_key == "singaporejudiciary":
+                    scraper_key = "singapore"
+                elif scraper_key == "indiankanoon":
+                    scraper_key = "indian-kanoon"
+                elif scraper_key == "germanlawarchive":
+                    scraper_key = "german-law"
+                elif scraper_key == "curiaeuropa":
+                    scraper_key = "curia-europa"
+                elif scraper_key == "supremecourtindia":
+                    scraper_key = "supremecourt-india"
+                elif scraper_key == "kenyalaw":
+                    scraper_key = "kenya-law"
+                elif scraper_key == "supremecourtjapan":
+                    scraper_key = "supremecourt-japan"
+                elif scraper_key == "legaltools":
+                    scraper_key = "legal-tools"
+                
+                self.policy = get_policy(scraper_key)
+                
+                # Use policy settings if available
+                if self.policy:
+                    rate_limit = self.policy.rate_limit
+                    timeout = self.policy.request_timeout
+                    max_retries = self.policy.max_retries
+                    retry_delay = self.policy.retry_delay
+                    respect_robots_txt = self.policy.respect_robots_txt
+                    
+            except KeyError:
+                pass  # No policy defined for this scraper
+        
         self.rate_limit = rate_limit
         self.timeout = timeout
         self.max_retries = max_retries
         self.retry_delay = retry_delay
         self._last_request_time = 0.0
+        self.respect_robots_txt = respect_robots_txt
+
+        # Set up robots.txt checker
+        user_agent_str = user_agent or (self.policy.user_agent if self.policy and self.policy.user_agent else self._default_user_agent())
+        self.robots_checker = RobotsChecker(user_agent=user_agent_str) if respect_robots_txt else None
 
         # Set up session
         self.session = requests.Session()
         self.session.headers.update(
             {
-                "User-Agent": user_agent or self._default_user_agent(),
+                "User-Agent": user_agent_str,
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Language": "en-US,en;q=0.5",
                 "Accept-Encoding": "gzip, deflate",
@@ -79,6 +127,15 @@ class BaseScraper(ABC):
         self.metrics = MetricsCollector(
             scraper_name=self.__class__.__name__, jurisdiction=self.jurisdiction
         )
+        
+        # Log policy information
+        if self.policy:
+            self.logger.info(
+                "scraper_initialized_with_policy",
+                jurisdiction=self.policy.jurisdiction,
+                rate_limit=self.rate_limit,
+                requires_attribution=self.policy.requires_attribution,
+            )
 
     @property
     @abstractmethod
@@ -136,8 +193,34 @@ class BaseScraper(ABC):
             NetworkError: For network-related issues
             RateLimitError: When rate limited
             AuthenticationError: For auth issues
+            ScrapingError: If robots.txt blocks access
         """
-        self._respect_rate_limit()
+        # Check robots.txt compliance
+        if self.robots_checker:
+            if not self.robots_checker.can_fetch(url):
+                raise ScrapingError(
+                    f"Access to {url} is blocked by robots.txt",
+                    url=url,
+                )
+            
+            # Check for crawl delay specified in robots.txt
+            crawl_delay = self.robots_checker.get_crawl_delay(url)
+            if crawl_delay and crawl_delay > self.rate_limit:
+                self.logger.info(
+                    "using_robots_crawl_delay",
+                    url=url,
+                    delay=crawl_delay,
+                    original_rate_limit=self.rate_limit,
+                )
+                # Temporarily use the crawl delay from robots.txt
+                original_rate_limit = self.rate_limit
+                self.rate_limit = crawl_delay
+                self._respect_rate_limit()
+                self.rate_limit = original_rate_limit
+            else:
+                self._respect_rate_limit()
+        else:
+            self._respect_rate_limit()
 
         # Merge headers
         request_headers = self.session.headers.copy()
