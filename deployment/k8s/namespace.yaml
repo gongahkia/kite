@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kite
+  labels:
+    name: kite
+    app.kubernetes.io/name: kite
+    app.kubernetes.io/part-of: kite

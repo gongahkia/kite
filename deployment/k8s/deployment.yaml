@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kite-api
+  namespace: kite
+  labels:
+    app: kite
+    component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kite
+      component: api
+  template:
+    metadata:
+      labels:
+        app: kite
+        component: api
+    spec:
+      containers:
+      - name: kite-api
+        image: ghcr.io/gongahkia/kite:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: grpc
+          containerPort: 9090
+          protocol: TCP
+        - name: metrics
+          containerPort: 9091
+          protocol: TCP
+        env:
+        - name: KITE_DATABASE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: kite-secrets
+              key: database-username
+        - name: KITE_DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: kite-secrets
+              key: database-password
+        - name: KITE_SECURITY_JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: kite-secrets
+              key: jwt-secret
+        volumeMounts:
+        - name: config
+          mountPath: /etc/kite
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+      volumes:
+      - name: config
+        configMap:
+          name: kite-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kite-worker
+  namespace: kite
+  labels:
+    app: kite
+    component: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kite
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: kite
+        component: worker
+    spec:
+      containers:
+      - name: kite-worker
+        image: ghcr.io/gongahkia/kite-worker:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: KITE_DATABASE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: kite-secrets
+              key: database-username
+        - name: KITE_DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: kite-secrets
+              key: database-password
+        volumeMounts:
+        - name: config
+          mountPath: /etc/kite
+          readOnly: true
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 2000m
+            memory: 1Gi
+      volumes:
+      - name: config
+        configMap:
+          name: kite-config

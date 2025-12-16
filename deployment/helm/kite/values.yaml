@@ -1,0 +1,94 @@
+replicaCount:
+  api: 3
+  worker: 2
+
+image:
+  repository: ghcr.io/gongahkia/kite
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+  grpcPort: 9090
+  metricsPort: 9091
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: kite.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  api:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  worker:
+    limits:
+      cpu: 2000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+autoscaling:
+  api:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  worker:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 85
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+config:
+  database:
+    driver: postgres
+    host: postgres
+    port: 5432
+    database: kite
+  queue:
+    driver: nats
+    url: "nats://nats:4222"
+  observability:
+    logLevel: info
+    logFormat: json
+
+secrets:
+  databaseUsername: "kite"
+  databasePassword: "changeme"
+  jwtSecret: "change-this-secret-in-production"

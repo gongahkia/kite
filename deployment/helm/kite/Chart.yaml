@@ -1,0 +1,16 @@
+apiVersion: v2
+name: kite
+description: A Helm chart for Kite Legal Case Law Scraper
+type: application
+version: 4.0.0
+appVersion: "4.0.0"
+keywords:
+  - legal
+  - scraper
+  - case-law
+  - api
+maintainers:
+  - name: gongahkia
+    url: https://github.com/gongahkia/kite
+sources:
+  - https://github.com/gongahkia/kite
