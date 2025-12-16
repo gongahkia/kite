@@ -1,0 +1,55 @@
+# Kite v4 Default Configuration
+
+server:
+  host: "0.0.0.0"
+  port: 8080
+  read_timeout: "30s"
+  write_timeout: "30s"
+  shutdown_timeout: "10s"
+  enable_grpc: false
+  grpc_port: 9090
+  enable_graphql: false
+  enable_websocket: false
+
+database:
+  driver: "sqlite"
+  database: "kite.db"
+  max_open_conns: 25
+  max_idle_conns: 5
+  conn_max_lifetime: "5m"
+
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+
+queue:
+  driver: "memory"
+  max_retries: 3
+  retry_delay: "5s"
+
+worker:
+  count: 4
+  job_timeout: "5m"
+  shutdown_grace: "30s"
+
+scraper:
+  user_agent: "Kite/4.0 (Legal Research Bot; +https://github.com/gongahkia/kite)"
+  request_timeout: "30s"
+  max_retries: 3
+  rate_limit_per_min: 20
+  respect_robots_txt: true
+  enable_proxies: false
+  concurrent_limit: 10
+
+observability:
+  log_level: "info"
+  log_format: "json"
+  metrics_enabled: true
+  metrics_port: 9091
+  tracing_enabled: false
+
+auth:
+  jwt_expiration: "24h"
+  api_key_enabled: true
+  rate_limit_per_min: 100
