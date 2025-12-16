@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Kite API Server
+  kite-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kite-api
+    ports:
+      - "8080:8080"   # HTTP API
+      - "9091:9091"   # Metrics
+    environment:
+      - KITE_SERVER_HOST=0.0.0.0
+      - KITE_SERVER_PORT=8080
+      - KITE_DATABASE_DRIVER=memory
+      - KITE_OBSERVABILITY_LOG_LEVEL=info
+      - KITE_OBSERVABILITY_LOG_FORMAT=json
+      - KITE_OBSERVABILITY_METRICS_ENABLED=true
+      - KITE_OBSERVABILITY_METRICS_PORT=9091
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # Prometheus (optional - for metrics collection)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: kite-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./deployment/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Grafana (optional - for metrics visualization)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: kite-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./deployment/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+    restart: unless-stopped
+    profiles:
+      - monitoring
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-data:
+  grafana-data:

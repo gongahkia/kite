@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'kite'
+    environment: 'development'
+
+scrape_configs:
+  - job_name: 'kite-api'
+    static_configs:
+      - targets: ['kite-api:9091']
+        labels:
+          service: 'kite-api'
+          version: '4.0.0'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
