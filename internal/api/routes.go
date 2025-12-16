@@ -121,6 +121,14 @@ func (s *Server) SetupRoutes() {
 	searchGroup.Get("/suggest", searchHandler.Suggest)
 	searchGroup.Get("/autocomplete", searchHandler.Autocomplete)
 
+	// Validation routes
+	validationHandler := handlers.NewValidationHandler(s.storage, s.logger, s.metrics)
+	validation := api.Group("/validation")
+	validation.Post("/case", validationHandler.ValidateCase)
+	validation.Post("/batch", validationHandler.ValidateBatch)
+	validation.Post("/duplicates", validationHandler.DetectDuplicates)
+	validation.Get("/metrics", validationHandler.GetQualityMetrics)
+
 	// Stats routes
 	statsHandler := handlers.NewStatsHandler(s.storage, s.logger)
 	stats := api.Group("/stats")
