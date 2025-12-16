@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package kite.api.v1;
+
+option go_package = "github.com/gongahkia/kite/api/proto;protov1";
+
+import "google/protobuf/timestamp.proto";
+
+// Case represents a legal case
+message Case {
+  string id = 1;
+  string case_number = 2;
+  string case_name = 3;
+  google.protobuf.Timestamp decision_date = 4;
+  string court = 5;
+  int32 court_level = 6;
+  string court_type = 7;
+  string jurisdiction = 8;
+  string docket = 9;
+  repeated string parties = 10;
+  repeated string judges = 11;
+  string summary = 12;
+  string full_text = 13;
+  repeated string key_issues = 14;
+  repeated string legal_concepts = 15;
+  string outcome = 16;
+  string procedural_history = 17;
+  repeated string citations = 18;
+  string url = 19;
+  string pdf_url = 20;
+  string source_database = 21;
+  google.protobuf.Timestamp scraped_at = 22;
+  google.protobuf.Timestamp last_updated = 23;
+  string language = 24;
+  string status = 25;
+}
+
+// Judge represents a judge
+message Judge {
+  string id = 1;
+  string name = 2;
+  string full_name = 3;
+  string title = 4;
+  string court = 5;
+  string jurisdiction = 6;
+  google.protobuf.Timestamp appointed_date = 7;
+  string biography = 8;
+  repeated string education = 9;
+  repeated string career = 10;
+  repeated string notable_cases = 11;
+  int32 total_cases = 12;
+}
+
+// Citation represents a legal citation
+message Citation {
+  int32 id = 1;
+  string format = 2;
+  string raw_citation = 3;
+  string normalized_citation = 4;
+  string volume = 5;
+  string reporter = 6;
+  string page = 7;
+  string year = 8;
+  string court = 9;
+  string case_number = 10;
+  string country = 11;
+  string citing_case_id = 12;
+  string cited_case_id = 13;
+  bool is_normalized = 14;
+}
+
+// Pagination for list requests
+message Pagination {
+  int32 page = 1;
+  int32 page_size = 2;
+  int32 total_count = 3;
+  int32 total_pages = 4;
+}
+
+// Filter for case queries
+message CaseFilter {
+  repeated string ids = 1;
+  string jurisdiction = 2;
+  string court = 3;
+  int32 court_level = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+  string status = 7;
+  repeated string judges = 8;
+  repeated string concepts = 9;
+  double min_quality = 10;
+  int32 limit = 11;
+  int32 offset = 12;
+  string order_by = 13;
+  bool order_desc = 14;
+}

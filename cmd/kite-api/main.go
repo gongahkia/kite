@@ -11,7 +11,9 @@ import (
 	"github.com/gongahkia/kite/internal/api"
 	"github.com/gongahkia/kite/internal/api/middleware"
 	"github.com/gongahkia/kite/internal/config"
+	"github.com/gongahkia/kite/internal/grpc"
 	"github.com/gongahkia/kite/internal/observability"
+	"github.com/gongahkia/kite/internal/queue"
 	"github.com/gongahkia/kite/internal/storage"
 )
 
@@ -93,11 +95,52 @@ func main() {
 
 	logger.Info("Authentication configured")
 
+	// Initialize queue
+	var jobQueue queue.Queue
+	switch cfg.Queue.Driver {
+	case "memory", "":
+		jobQueue = queue.NewMemoryQueue()
+		logger.Info("Using in-memory queue")
+
+	case "nats":
+		natsConfig := &queue.NATSQueueConfig{
+			URL:        cfg.Queue.URL,
+			Stream:     "KITE_JOBS",
+			Consumer:   "kite-worker",
+			MaxRetries: cfg.Queue.MaxRetries,
+		}
+		jobQueue, err = queue.NewNATSQueue(natsConfig)
+		if err != nil {
+			logger.Fatalf("Failed to initialize NATS queue: %v", err)
+		}
+		logger.Infof("Using NATS queue: %s", cfg.Queue.URL)
+
+	case "redis":
+		redisAddr := fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port)
+		redisConfig := &queue.RedisQueueConfig{
+			Addr:       redisAddr,
+			Password:   cfg.Redis.Password,
+			DB:         cfg.Redis.DB,
+			Stream:     "kite:jobs",
+			Group:      "kite-workers",
+			Consumer:   "worker-1",
+			MaxRetries: cfg.Queue.MaxRetries,
+		}
+		jobQueue, err = queue.NewRedisQueue(redisConfig)
+		if err != nil {
+			logger.Fatalf("Failed to initialize Redis queue: %v", err)
+		}
+		logger.Infof("Using Redis queue: %s", redisAddr)
+
+	default:
+		logger.Fatalf("Unsupported queue driver: %s", cfg.Queue.Driver)
+	}
+
 	// Create API server
 	server := api.NewServer(store, logger, metrics, authConfig)
 	server.SetupRoutes()
 
-	// Start server in goroutine
+	// Start HTTP server in goroutine
 	serverAddr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
 	go func() {
 		logger.Infof("Starting HTTP server on %s", serverAddr)
@@ -106,19 +149,54 @@ func main() {
 		}
 	}()
 
+	// Start gRPC server if enabled
+	var grpcServer *grpc.Server
+	if cfg.Server.EnableGRPC {
+		grpcConfig := &grpc.ServerConfig{
+			Port:    cfg.Server.GRPCPort,
+			Storage: store,
+			Queue:   jobQueue,
+			Logger:  logger,
+		}
+
+		grpcServer, err = grpc.NewServer(grpcConfig)
+		if err != nil {
+			logger.Fatalf("Failed to create gRPC server: %v", err)
+		}
+
+		go func() {
+			logger.Infof("Starting gRPC server on port %d", cfg.Server.GRPCPort)
+			if err := grpcServer.Start(); err != nil {
+				logger.Fatalf("gRPC server failed to start: %v", err)
+			}
+		}()
+	}
+
 	// Wait for interrupt signal
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	logger.Info("Shutting down server...")
+	logger.Info("Shutting down servers...")
 
 	// Graceful shutdown with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Server.ShutdownTimeout)
 	defer cancel()
 
+	// Shutdown HTTP server
 	if err := server.Shutdown(); err != nil {
-		logger.Errorf("Server forced to shutdown: %v", err)
+		logger.Errorf("HTTP server forced to shutdown: %v", err)
+	}
+
+	// Shutdown gRPC server if running
+	if grpcServer != nil {
+		grpcServer.Stop()
+		logger.Info("gRPC server stopped")
+	}
+
+	// Close queue
+	if err := jobQueue.Close(ctx); err != nil {
+		logger.Errorf("Failed to close queue: %v", err)
 	}
 
 	// Close storage
@@ -126,7 +204,7 @@ func main() {
 		logger.Errorf("Failed to close storage: %v", err)
 	}
 
-	logger.Info("Server exited")
+	logger.Info("All servers exited")
 
 	// Wait for context timeout
 	<-ctx.Done()

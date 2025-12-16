@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package kite.api.v1;
+
+option go_package = "github.com/gongahkia/kite/api/proto;protov1";
+
+import "api/proto/common.proto";
+
+// SearchService handles search operations
+service SearchService {
+  // SearchCases performs full-text search on cases
+  rpc SearchCases(SearchCasesRequest) returns (SearchCasesResponse);
+
+  // GetCase retrieves a single case by ID
+  rpc GetCase(GetCaseRequest) returns (Case);
+
+  // ListCases lists cases with filtering
+  rpc ListCases(ListCasesRequest) returns (ListCasesResponse);
+
+  // StreamCases streams cases matching criteria
+  rpc StreamCases(StreamCasesRequest) returns (stream Case);
+
+  // GetCitationNetwork retrieves citation network for a case
+  rpc GetCitationNetwork(GetCitationNetworkRequest) returns (CitationNetworkResponse);
+}
+
+// SearchCasesRequest performs search
+message SearchCasesRequest {
+  string query = 1;
+  repeated string fields = 2; // case_name, summary, full_text
+  CaseFilter filters = 3;
+  bool fuzzy = 4;
+  int32 limit = 5;
+  int32 offset = 6;
+}
+
+// SearchCasesResponse returns search results
+message SearchCasesResponse {
+  repeated CaseSearchResult results = 1;
+  Pagination pagination = 2;
+  int32 total_hits = 3;
+  double search_time_ms = 4;
+}
+
+// CaseSearchResult represents a search result with score
+message CaseSearchResult {
+  Case case = 1;
+  double score = 2;
+  repeated string highlights = 3;
+}
+
+// GetCaseRequest requests a single case
+message GetCaseRequest {
+  string id = 1;
+}
+
+// ListCasesRequest lists cases
+message ListCasesRequest {
+  CaseFilter filter = 1;
+}
+
+// ListCasesResponse returns list of cases
+message ListCasesResponse {
+  repeated Case cases = 1;
+  Pagination pagination = 2;
+}
+
+// StreamCasesRequest streams cases
+message StreamCasesRequest {
+  CaseFilter filter = 1;
+  int32 batch_size = 2;
+}
+
+// GetCitationNetworkRequest requests citation network
+message GetCitationNetworkRequest {
+  string case_id = 1;
+  int32 depth = 2; // levels of citations to traverse
+}
+
+// CitationNetworkResponse returns citation network
+message CitationNetworkResponse {
+  repeated CitationNode nodes = 1;
+  repeated CitationEdge edges = 2;
+  NetworkStats stats = 3;
+}
+
+// CitationNode represents a node in citation network
+message CitationNode {
+  string case_id = 1;
+  string case_name = 2;
+  string court = 3;
+  int32 citation_count = 4;
+  double influence_score = 5;
+}
+
+// CitationEdge represents an edge in citation network
+message CitationEdge {
+  string source_id = 1;
+  string target_id = 2;
+  string citation_text = 3;
+}
+
+// NetworkStats provides network statistics
+message NetworkStats {
+  int32 total_nodes = 1;
+  int32 total_edges = 2;
+  int32 max_depth = 3;
+  double avg_citations = 4;
+}

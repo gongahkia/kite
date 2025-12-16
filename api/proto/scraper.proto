@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package kite.api.v1;
+
+option go_package = "github.com/gongahkia/kite/api/proto;protov1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "api/proto/common.proto";
+
+// ScraperService handles scraping operations
+service ScraperService {
+  // StartScrape initiates a new scraping job
+  rpc StartScrape(StartScrapeRequest) returns (ScrapeJob);
+
+  // GetScrapeStatus retrieves the status of a scraping job
+  rpc GetScrapeStatus(GetScrapeStatusRequest) returns (ScrapeJob);
+
+  // ListScrapeJobs lists all scraping jobs
+  rpc ListScrapeJobs(ListScrapeJobsRequest) returns (ListScrapeJobsResponse);
+
+  // StreamScrapeProgress streams real-time progress updates
+  rpc StreamScrapeProgress(StreamScrapeProgressRequest) returns (stream ScrapeProgressUpdate);
+
+  // CancelScrape cancels a running scraping job
+  rpc CancelScrape(CancelScrapeRequest) returns (google.protobuf.Empty);
+}
+
+// StartScrapeRequest initiates a scraping job
+message StartScrapeRequest {
+  string jurisdiction = 1;
+  string court = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+  int32 max_cases = 5;
+  string priority = 6; // low, normal, high
+  map<string, string> options = 7;
+}
+
+// ScrapeJob represents a scraping job
+message ScrapeJob {
+  string job_id = 1;
+  string jurisdiction = 2;
+  string court = 3;
+  string status = 4; // pending, running, completed, failed, cancelled
+  int32 total_cases = 5;
+  int32 scraped_cases = 6;
+  int32 failed_cases = 7;
+  double progress_percent = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp started_at = 10;
+  google.protobuf.Timestamp completed_at = 11;
+  string error_message = 12;
+}
+
+// GetScrapeStatusRequest requests job status
+message GetScrapeStatusRequest {
+  string job_id = 1;
+}
+
+// ListScrapeJobsRequest lists jobs
+message ListScrapeJobsRequest {
+  string status = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+// ListScrapeJobsResponse returns list of jobs
+message ListScrapeJobsResponse {
+  repeated ScrapeJob jobs = 1;
+  Pagination pagination = 2;
+}
+
+// StreamScrapeProgressRequest requests progress stream
+message StreamScrapeProgressRequest {
+  string job_id = 1;
+}
+
+// ScrapeProgressUpdate is a progress update
+message ScrapeProgressUpdate {
+  string job_id = 1;
+  string status = 2;
+  int32 scraped_cases = 3;
+  int32 total_cases = 4;
+  double progress_percent = 5;
+  string current_case = 6;
+  google.protobuf.Timestamp timestamp = 7;
+}
+
+// CancelScrapeRequest cancels a job
+message CancelScrapeRequest {
+  string job_id = 1;
+}
