@@ -114,6 +114,13 @@ func (s *Server) SetupRoutes() {
 	citations.Get("/:id", citationHandler.GetCitation)
 	citations.Post("/", citationHandler.CreateCitation)
 
+	// Search routes (advanced search API)
+	searchHandler := handlers.NewSearchHandler(s.storage, s.logger, s.metrics)
+	searchGroup := api.Group("/search")
+	searchGroup.Post("/", searchHandler.Search)
+	searchGroup.Get("/suggest", searchHandler.Suggest)
+	searchGroup.Get("/autocomplete", searchHandler.Autocomplete)
+
 	// Stats routes
 	statsHandler := handlers.NewStatsHandler(s.storage, s.logger)
 	stats := api.Group("/stats")

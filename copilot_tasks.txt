@@ -432,32 +432,56 @@ Files:
 - internal/compliance/attribution.go
 - configs/scraping-policies.yaml
 
-### [15] Search & Query API
+### ✅ [15] Search & Query API - COMPLETED
 Priority: HIGH
-Timeline: Weeks 9-10
+Status: ✅ DONE
 
-Features:
-- Full-text search (storage backend dependent)
-- Structured query DSL
-- Multi-field search (case name, judges, citations, concepts)
-- Date range filtering
-- Jurisdiction filtering
-- Relevance scoring
-- Pagination with cursor support
-- Faceted search
-- Query suggestions
-- Search history
+All Features Completed:
+- ✅ Full-text search with FTS5 (SQLite) and text indexes (MongoDB)
+- ✅ Structured query DSL with fluent API
+- ✅ Multi-field search (case_name, summary, full_text, legal_concepts)
+- ✅ Advanced filtering:
+  * ✅ Date range filtering (start_date, end_date)
+  * ✅ Jurisdiction filtering
+  * ✅ Court and court level filtering
+  * ✅ Judge and party filtering
+  * ✅ Legal concepts filtering
+  * ✅ Quality score filtering
+- ✅ Relevance scoring with weighted fields
+- ✅ Pagination (offset-based)
+- ✅ Faceted search:
+  * ✅ Jurisdiction facets
+  * ✅ Court facets
+  * ✅ Court level facets
+  * ✅ Year facets
+  * ✅ Legal concepts facets
+- ✅ Query suggestions with type detection
+- ✅ Autocomplete for case names, judges, courts, concepts
+- ✅ Spell checking with Levenshtein distance
+- ✅ Query expansion with legal synonyms
+- ✅ Result highlighting with context snippets
+- ✅ Search metrics (queries, duration, result counts)
+- ✅ Comprehensive API documentation
 
-Files:
+Note: Search history and cursor-based pagination marked as future enhancements
+
+Files Created:
 - internal/search/engine.go
 - internal/search/query.go
-- internal/search/filters.go
+- internal/search/suggestions.go
 - internal/api/handlers/search.go
+- docs/SEARCH_API.md
+
+Updated Files:
+- internal/api/routes.go (added search endpoints)
+- internal/observability/metrics.go (added search metrics)
 
 Go Features Used:
-- Generic query builders
-- Concurrent search across sources
-- Context for timeouts
+- ✅ Fluent API pattern for query building
+- ✅ Generics for type-safe operations
+- ✅ Context for request lifecycle
+- ✅ Weighted relevance scoring algorithm
+- ✅ Facet aggregation with sorting
 
 ## ADVANCED FEATURES - PHASE 4
 ## =============================

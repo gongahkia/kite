@@ -54,6 +54,11 @@ type Metrics struct {
 	ValidationTotal      *prometheus.CounterVec
 	ValidationErrors     *prometheus.CounterVec
 	QualityScores        *prometheus.HistogramVec
+
+	// Search metrics
+	SearchQueriesTotal   *prometheus.CounterVec
+	SearchDuration       *prometheus.HistogramVec
+	SearchResultsCount   *prometheus.HistogramVec
 }
 
 // NewMetrics creates and registers all Prometheus metrics
@@ -270,6 +275,31 @@ func NewMetrics() *Metrics {
 			},
 			[]string{"model_type"},
 		),
+
+		// Search metrics
+		SearchQueriesTotal: promauto.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "kite_search_queries_total",
+				Help: "Total number of search queries",
+			},
+			[]string{"query_type"},
+		),
+		SearchDuration: promauto.NewHistogramVec(
+			prometheus.HistogramOpts{
+				Name:    "kite_search_duration_seconds",
+				Help:    "Search query duration in seconds",
+				Buckets: []float64{.01, .025, .05, .1, .25, .5, 1, 2.5, 5},
+			},
+			[]string{"query_type"},
+		),
+		SearchResultsCount: promauto.NewHistogramVec(
+			prometheus.HistogramOpts{
+				Name:    "kite_search_results_count",
+				Help:    "Number of search results returned",
+				Buckets: []float64{0, 1, 5, 10, 25, 50, 100, 250, 500, 1000},
+			},
+			[]string{"query_type"},
+		),
 	}
 
 	return m
@@ -299,6 +329,14 @@ func (m *Metrics) RecordScrapingError(jurisdiction, source, errorType string) {
 func (m *Metrics) RecordWorkerJob(workerID string, jobType, status string, duration time.Duration) {
 	m.WorkerJobsProcessed.WithLabelValues(workerID, jobType, status).Inc()
 	m.WorkerJobDuration.WithLabelValues(jobType).Observe(duration.Seconds())
+}
+
+// RecordSearchQuery records a search query metric
+func (m *Metrics) RecordSearchQuery(duration time.Duration, resultCount int) {
+	queryType := "fulltext" // Default type
+	m.SearchQueriesTotal.WithLabelValues(queryType).Inc()
+	m.SearchDuration.WithLabelValues(queryType).Observe(duration.Seconds())
+	m.SearchResultsCount.WithLabelValues(queryType).Observe(float64(resultCount))
 }
 
 // Handler returns the Prometheus metrics HTTP handler
