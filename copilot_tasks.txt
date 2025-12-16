@@ -165,7 +165,7 @@
 Priority: CRITICAL
 Status: ✅ DONE
 
-Completed Features:
+All Features Completed:
 - Fiber-based REST API with versioned routes (/api/v1/...)
 - Health check endpoints (/health, /ready, /metrics)
 - Graceful shutdown handling
@@ -174,13 +174,13 @@ Completed Features:
 - Request ID tracking
 - Error handling with consistent JSON responses
 - Full CRUD handlers for Cases, Judges, Citations
-
-Remaining:
-- OpenAPI 3.0 specification auto-generation
-- Swagger UI for interactive documentation
-- Rate limiting per endpoint/IP (have domain rate limiting)
-- API key authentication
-- JWT token support
+- ✅ OpenAPI 3.0 specification with Swagger annotations
+- ✅ Swagger UI for interactive documentation (/swagger/index.html)
+- ✅ Rate limiting per endpoint/IP with configurable limits
+- ✅ API key authentication middleware
+- ✅ JWT token authentication with refresh support
+- ✅ Role-based access control (RBAC)
+- ✅ Authentication endpoints (/auth/login, /auth/refresh, /auth/validate, /auth/api-key)
 
 ### ✅ [2] Core Scraper Engine (Multi-Jurisdiction) - PARTIALLY COMPLETED
 Priority: CRITICAL

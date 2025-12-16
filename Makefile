@@ -17,6 +17,7 @@ help:
 	@echo "  make run           - Run the API server"
 	@echo "  make test          - Run tests"
 	@echo "  make clean         - Clean build artifacts"
+	@echo "  make swagger       - Generate Swagger/OpenAPI documentation"
 	@echo "  make docker-build  - Build Docker image"
 	@echo "  make docker-run    - Run Docker container"
 	@echo "  make install       - Install dependencies"
@@ -99,7 +100,16 @@ dev:
 		make run; \
 	fi
 
-# Generate documentation
+# Generate Swagger/OpenAPI documentation
+swagger:
+	@echo "Generating Swagger documentation..."
+	@if command -v swag >/dev/null 2>&1; then \
+		swag init -g internal/api/swagger.go -o docs --parseDependency --parseInternal; \
+	else \
+		echo "swag not installed. Run: go install github.com/swaggo/swag/cmd/swag@latest"; \
+	fi
+
+# Generate godoc documentation
 docs:
 	@echo "Generating documentation..."
 	@if command -v godoc >/dev/null 2>&1; then \

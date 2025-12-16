@@ -10,14 +10,15 @@ import (
 
 // Config represents the application configuration
 type Config struct {
-	Server      ServerConfig      `mapstructure:"server"`
-	Database    DatabaseConfig    `mapstructure:"database"`
-	Redis       RedisConfig       `mapstructure:"redis"`
-	Queue       QueueConfig       `mapstructure:"queue"`
-	Worker      WorkerConfig      `mapstructure:"worker"`
-	Scraper     ScraperConfig     `mapstructure:"scraper"`
+	Server        ServerConfig        `mapstructure:"server"`
+	Database      DatabaseConfig      `mapstructure:"database"`
+	Redis         RedisConfig         `mapstructure:"redis"`
+	Queue         QueueConfig         `mapstructure:"queue"`
+	Worker        WorkerConfig        `mapstructure:"worker"`
+	Scraper       ScraperConfig       `mapstructure:"scraper"`
 	Observability ObservabilityConfig `mapstructure:"observability"`
-	Auth        AuthConfig        `mapstructure:"auth"`
+	Auth          AuthConfig          `mapstructure:"auth"`
+	Security      SecurityConfig      `mapstructure:"security"`
 }
 
 // ServerConfig holds HTTP server configuration
@@ -97,6 +98,13 @@ type AuthConfig struct {
 	JWTExpiration   time.Duration `mapstructure:"jwt_expiration"`
 	APIKeyEnabled   bool          `mapstructure:"api_key_enabled"`
 	RateLimitPerMin int           `mapstructure:"rate_limit_per_min"`
+}
+
+// SecurityConfig holds security configuration (for main.go)
+type SecurityConfig struct {
+	JWTSecret     string
+	JWTExpiration time.Duration
+	APIKeys       map[string]string
 }
 
 // Load loads configuration from file and environment variables
@@ -198,6 +206,10 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("auth.jwt_expiration", "24h")
 	v.SetDefault("auth.api_key_enabled", true)
 	v.SetDefault("auth.rate_limit_per_min", 100)
+
+	// Security defaults
+	v.SetDefault("security.jwt_secret", "change-this-secret-in-production")
+	v.SetDefault("security.jwt_expiration", "24h")
 }
 
 // validate validates the configuration

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gongahkia/kite/internal/api"
+	"github.com/gongahkia/kite/internal/api/middleware"
 	"github.com/gongahkia/kite/internal/config"
 	"github.com/gongahkia/kite/internal/observability"
 	"github.com/gongahkia/kite/internal/storage"
@@ -40,8 +41,22 @@ func main() {
 		logger.Fatalf("Unsupported storage driver: %s", cfg.Database.Driver)
 	}
 
+	// Initialize authentication configuration
+	authConfig := &middleware.AuthConfig{
+		APIKeys:       make(map[string]string),
+		JWTSecret:     cfg.Security.JWTSecret,
+		JWTExpiration: cfg.Security.JWTExpiration,
+	}
+
+	// Add default API keys from config if available
+	for key, clientID := range cfg.Security.APIKeys {
+		authConfig.APIKeys[key] = clientID
+	}
+
+	logger.Info("Authentication configured")
+
 	// Create API server
-	server := api.NewServer(store, logger, metrics)
+	server := api.NewServer(store, logger, metrics, authConfig)
 	server.SetupRoutes()
 
 	// Start server in goroutine
