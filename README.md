@@ -1,5 +1,7 @@
-[![](https://img.shields.io/badge/kite_1.0.0-passing-green)](https://github.com/gongahkia/kite/releases/tag/1.0.0)
-[![](https://img.shields.io/badge/kite_2.0.0-passing-dark_green)](https://github.com/gongahkia/kite/releases/tag/2.0.0)
+[![kite_1.0.0](https://img.shields.io/badge/kite_1.0.0-passing-10B981)](https://github.com/gongahkia/kite/releases/tag/1.0.0)
+[![kite_2.0.0](https://img.shields.io/badge/kite_2.0.0-passing-059669)](https://github.com/gongahkia/kite/releases/tag/2.0.0)
+[![kite_3.0.0](https://img.shields.io/badge/kite_3.0.0-passing-047857)](https://github.com/gongahkia/kite/releases/tag/3.0.0)
+[![kite_4.0.0](https://img.shields.io/badge/kite_4.0.0-passing-065F46)](https://github.com/gongahkia/kite/releases/tag/4.0.0)
 
 # `Kite`
 
