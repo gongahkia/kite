@@ -31,11 +31,26 @@ type Storage interface {
 	// Search operations
 	SearchCases(ctx context.Context, query SearchQuery) ([]*models.Case, error)
 
+	// Transaction operations (optional, nil if not supported)
+	BeginTx(ctx context.Context) (Transaction, error)
+
 	// Health check
 	Ping(ctx context.Context) error
 
 	// Close connection
 	Close() error
+}
+
+// Transaction represents a database transaction
+type Transaction interface {
+	// Execute operations within the transaction
+	SaveCase(ctx context.Context, c *models.Case) error
+	SaveJudge(ctx context.Context, j *models.Judge) error
+	SaveCitation(ctx context.Context, c *models.Citation) error
+
+	// Transaction control
+	Commit() error
+	Rollback() error
 }
 
 // CaseFilter represents filters for case queries
