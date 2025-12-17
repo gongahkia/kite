@@ -5,7 +5,22 @@
 
 # `Kite`
 
-[Extensible library](#architecture) that provides a [bundle of scrapers](#usage) for legal case law from [various jurisdictions](#support) worldwide.
+[Extensible](#architecture) [API backend](#rest-api-endpoints) for scraping legal case law from [17+ jurisdictions](#support) worldwide.
+
+## Usage
+
+1. First run the below commands.
+
+```console
+$ git clone https://github.com/gongahkia/kite && cd kite
+$ make build
+```
+
+2. Run Kite's API server at `http://localhost:8080` with the following commands.
+
+```console
+$ ./bin/kite-api serve --config configs/default.yaml
+```
 
 ## Stack
 
@@ -132,39 +147,11 @@
 
 </details>
 
-## Usage
-
-Kite v4 is an API-first backend service that exposes RESTful and gRPC endpoints for legal case law scraping and analysis.
-
-### Quick Start
-
-#### 1. Clone and Build
-
-```console
-$ git clone https://github.com/gongahkia/kite && cd kite
-$ make build
-```
-
-#### 2. Run the API Server
-
-```console
-$ ./bin/kite-api serve --config configs/default.yaml
-```
-
-The API server will start on `http://localhost:8080` by default.
-
-#### 3. Verify Health
-
-```console
-$ curl http://localhost:8080/health
-{"status":"healthy","version":"4.0.0"}
-```
-
 ### Rest API Endpoints
 
-Kite exposes the following REST endpoints at `/api/v1/`.
+<details>
+<summary><strong>Search Cases</strong></summary>
 
-**Search Cases**
 ```console
 GET /api/v1/search
 Query Parameters:
@@ -176,12 +163,20 @@ Query Parameters:
   - court (optional): filter by court name
 ```
 
-**Get Case by ID**
+</details>
+
+<details>
+<summary><strong>Get Case by ID</strong></summary>
+
 ```console
 GET /api/v1/cases/{jurisdiction}/{case_id}
 ```
 
-**Submit Scraping Job**
+</details>
+
+<details>
+<summary><strong>Submit Scraping Job</strong></summary>
+
 ```console
 POST /api/v1/jobs
 Body: {
@@ -194,19 +189,27 @@ Body: {
 }
 ```
 
-**Get Job Status**
+</details>
+
+<details>
+<summary><strong>Get Job Status</strong></summary>
+
 ```console
 GET /api/v1/jobs/{job_id}
 ```
 
-**List Supported Jurisdictions**
+</details>
+
+<details>
+<summary><strong>List Supported Jurisdictions</strong></summary>
+
 ```console
 GET /api/v1/jurisdictions
 ```
 
 </details>
 
-### Integration Examples
+### Quickstart Examples
 
 <details>
 <summary><strong>Using cURL</strong></summary>
@@ -343,56 +346,13 @@ $ kubectl apply -f deployment/k8s/service.yaml
 
 </details>
 
-### Configuration
-
-Edit `configs/default.yaml` to customize:
-
-- **Server settings**: ports, timeouts, rate limits
-- **Jurisdiction policies**: rate limits per jurisdiction, robots.txt compliance
-- **Worker pool size**: concurrent scraping workers
-- **Storage backend**: PostgreSQL, MongoDB, or in-memory
-- **Job queue**: NATS or Redis Streams
-- **Observability**: logging levels, metrics collection
-
-### API Documentation
-
-Interactive API documentation is available at:
-
-- **Swagger UI**: `http://localhost:8080/swagger`
-- **OpenAPI spec**: `http://localhost:8080/openapi.json`
-- **gRPC reflection**: enabled on port `9090`
-
-### Monitoring
-
-Access observability endpoints:
-
-- **Prometheus metrics**: `http://localhost:8080/metrics`
-- **Health check**: `http://localhost:8080/health`
-- **Readiness check**: `http://localhost:8080/ready`
-- **Performance profiling**: `http://localhost:8080/debug/pprof`
-
-### Admin CLI
-
-Manage the system using the admin CLI:
-
-```console
-$ kite-admin migrate up              # Run database migrations
-$ kite-admin workers status          # Check worker health
-$ kite-admin jobs stats              # View job queue statistics
-$ kite-admin cache flush             # Clear cache
-```
-
 ### Client Libraries
-
-Official client libraries are available:
 
 | Language | Package Manager | Installation Command |
 |----------|----------------|---------------------|
 | Go | go get | `go get github.com/gongahkia/kite/pkg/client` |
 | Python | pip | `pip install kite-client` |
 | JavaScript/TypeScript | npm | `npm install @kite/client` |
-
-Or generate your own from the OpenAPI spec using tools like [openapi-generator](https://openapi-generator.tech/).
 
 ## Architecture
 
