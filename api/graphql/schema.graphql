@@ -1,0 +1,138 @@
+# Kite GraphQL API Schema
+# Legal case law scraping and search API
+
+scalar DateTime
+scalar JSON
+
+# Represents a legal case
+type Case {
+  id: ID!
+  caseName: String!
+  caseNumber: String
+  court: String!
+  jurisdiction: String!
+  decisionDate: DateTime!
+  summary: String
+  fullText: String
+  judges: [Judge!]
+  parties: [String!]
+  citations: [Citation!]
+  legalTopics: [String!]
+  url: String!
+  pdfUrl: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# Represents a judge
+type Judge {
+  id: ID!
+  name: String!
+  title: String
+  court: String
+  biography: String
+}
+
+# Represents a legal citation
+type Citation {
+  id: ID!
+  type: CitationType!
+  text: String!
+  caseId: String
+  targetCase: Case
+}
+
+enum CitationType {
+  STATUTE
+  CASE
+  REGULATION
+  CONSTITUTION
+  TREATY
+  OTHER
+}
+
+# Represents a scraping job
+type ScrapingJob {
+  id: ID!
+  jurisdiction: String!
+  query: String
+  status: JobStatus!
+  priority: JobPriority!
+  createdAt: DateTime!
+  startedAt: DateTime
+  completedAt: DateTime
+  result: JSON
+  error: String
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  RETRYING
+  CANCELLED
+}
+
+enum JobPriority {
+  LOW
+  NORMAL
+  HIGH
+}
+
+# Search input
+input SearchInput {
+  query: String!
+  jurisdiction: String
+  court: String
+  dateFrom: DateTime
+  dateTo: DateTime
+  limit: Int
+  offset: Int
+}
+
+# Job submission input
+input SubmitJobInput {
+  jurisdiction: String!
+  query: String
+  priority: JobPriority
+}
+
+type Query {
+  # Search for cases
+  searchCases(input: SearchInput!): [Case!]!
+  
+  # Get a case by ID
+  getCaseByID(id: ID!): Case
+  
+  # Get job status
+  getJobStatus(id: ID!): ScrapingJob
+  
+  # List all supported jurisdictions
+  listJurisdictions: [String!]!
+  
+  # Get cases by jurisdiction
+  getCasesByJurisdiction(jurisdiction: String!, limit: Int, offset: Int): [Case!]!
+}
+
+type Mutation {
+  # Submit a new scraping job
+  submitScrapingJob(input: SubmitJobInput!): ScrapingJob!
+  
+  # Cancel a running job
+  cancelJob(id: ID!): ScrapingJob!
+}
+
+type Subscription {
+  # Subscribe to job status updates
+  jobStatusUpdated(id: ID!): ScrapingJob!
+  
+  # Subscribe to new cases in a jurisdiction
+  newCase(jurisdiction: String!): Case!
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
