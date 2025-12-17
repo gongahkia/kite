@@ -182,95 +182,242 @@ flowchart TD
 
 ## Usage
 
-The below instructions are for running `Kite` on your client machine.
+Kite v4 is an API-first backend service that exposes RESTful and gRPC endpoints for legal case law scraping and analysis.
 
-1. Execute the below.
+### Quick Start
+
+#### 1. Clone and Build
 
 ```console
 $ git clone https://github.com/gongahkia/kite && cd kite
+$ make build
 ```
 
-2. To use `Kite` [CLI](./kite/cli.py), run the below.
+#### 2. Run the API Server
 
 ```console
-$ kite search courtlistener "constitutional law" --limit 5
+$ ./bin/kite-api serve --config configs/default.yaml
 ```
 
-3. Alternatively, install from PyPI for library usage.
+The API server will start on `http://localhost:8080` by default.
+
+#### 3. Verify Health
 
 ```console
-$ pip install kite
+$ curl http://localhost:8080/health
+{"status":"healthy","version":"4.0.0"}
 ```
 
-4. Most commonly, you would include `Kite` directly as a [Library](https://docs.python.org/3/library/index.html) within your projects.
+### API Endpoints
 
-### [Search](./kite/scrapers/) Cases Across Jurisdictions
+#### REST API
 
-```py
-from kite import CourtListenerScraper
+Kite exposes the following REST endpoints at `/api/v1/`:
 
-with CourtListenerScraper() as scraper:
-    cases = scraper.search_cases(
-        query="privacy rights",
-        start_date="2023-01-01",
-        limit=10
-    )
-
-    for case in cases:
-        print(f"{case.case_name} - {case.date}")
-        print(f"Court: {case.court}")
-        print(f"URL: {case.url}")
+**Search Cases**
+```console
+GET /api/v1/search
+Query Parameters:
+  - jurisdiction (required): courtlistener, bailii, canlii, austlii, etc.
+  - query (required): search terms
+  - limit (optional): max results (default: 10)
+  - start_date (optional): YYYY-MM-DD
+  - end_date (optional): YYYY-MM-DD
+  - court (optional): filter by court name
 ```
 
-### [Retrieve](./kite/scrapers/) Specific Cases by ID
-
-```py
-from kite import CanLIIScraper
-
-with CanLIIScraper() as scraper:
-    case = scraper.get_case_by_id("2023 SCC 15")
-    print(f"Case: {case.case_name}")
-    print(f"Judges: {', '.join(case.judges)}")
+**Get Case by ID**
+```console
+GET /api/v1/cases/{jurisdiction}/{case_id}
 ```
 
-### [Multi-jurisdiction](./kite/scrapers/) Research
-
-```py
-from kite import CourtListenerScraper, BAILIIScraper, AustLIIScraper
-
-scrapers = [
-    ("US", CourtListenerScraper()),
-    ("UK", BAILIIScraper()),
-    ("AU", AustLIIScraper())
-]
-
-query = "data protection"
-all_cases = []
-
-for jurisdiction, scraper in scrapers:
-    with scraper:
-        cases = scraper.search_cases(query=query, limit=5)
-        for case in cases:
-            case.metadata["jurisdiction"] = jurisdiction
-            all_cases.append(case)
+**Submit Scraping Job**
+```console
+POST /api/v1/jobs
+Body: {
+  "jurisdiction": "courtlistener",
+  "action": "search",
+  "parameters": {
+    "query": "constitutional law",
+    "limit": 50
+  }
+}
 ```
 
-### [Batch Process](./kite/utils/) with Error Handling
+**Get Job Status**
+```console
+GET /api/v1/jobs/{job_id}
+```
 
-```py
-from kite import IndianKanoonScraper
-import logging
+**List Supported Jurisdictions**
+```console
+GET /api/v1/jurisdictions
+```
 
-case_ids = ["AIR 2023 SC 1234", "AIR 2023 SC 5678"]
+### Integration Examples
 
-with IndianKanoonScraper() as scraper:
-    for case_id in case_ids:
-        try:
-            case = scraper.get_case_by_id(case_id)
-            if case:
-                print(f"Retrieved: {case.case_name}")
-        except Exception as e:
-            logging.error(f"Failed to retrieve {case_id}: {e}")
+#### Using cURL
+
+**Search for cases:**
+```console
+$ curl "http://localhost:8080/api/v1/search?jurisdiction=courtlistener&query=privacy%20rights&limit=10"
+```
+
+**Get specific case:**
+```console
+$ curl "http://localhost:8080/api/v1/cases/canlii/2023%20SCC%2015"
+```
+
+**Submit background job:**
+```console
+$ curl -X POST http://localhost:8080/api/v1/jobs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jurisdiction": "bailii",
+    "action": "search",
+    "parameters": {
+      "query": "contract law",
+      "limit": 100
+    }
+  }'
+```
+
+#### Using HTTP Client Libraries
+
+**Python with requests:**
+```console
+import requests
+
+response = requests.get('http://localhost:8080/api/v1/search', params={
+    'jurisdiction': 'courtlistener',
+    'query': 'data protection',
+    'limit': 5
+})
+cases = response.json()
+```
+
+**JavaScript with fetch:**
+```console
+const response = await fetch('http://localhost:8080/api/v1/search?' + new URLSearchParams({
+  jurisdiction: 'austlii',
+  query: 'tort law',
+  limit: '10'
+}));
+const cases = await response.json();
+```
+
+**Go with net/http:**
+```console
+resp, err := http.Get("http://localhost:8080/api/v1/search?jurisdiction=worldlii&query=human%20rights&limit=20")
+if err != nil {
+    log.Fatal(err)
+}
+defer resp.Body.Close()
+```
+
+#### gRPC Integration
+
+Kite also exposes a gRPC API on port `9090`. Use the Protocol Buffer definitions in `api/proto/` to generate client code:
+
+```console
+$ buf generate api/proto
+```
+
+Then import and use in your application:
+```console
+import "kite/api/proto/scraper"
+
+conn, _ := grpc.Dial("localhost:9090", grpc.WithInsecure())
+client := scraper.NewScraperServiceClient(conn)
+```
+
+#### WebSocket Streaming
+
+For real-time updates, connect to the WebSocket endpoint:
+
+```console
+$ wscat -c ws://localhost:8080/ws/jobs/{job_id}
+```
+
+### Deployment
+
+#### Docker
+
+```console
+$ docker build -t kite:v4 .
+$ docker run -p 8080:8080 -p 9090:9090 kite:v4
+```
+
+#### Docker Compose
+
+```console
+$ docker-compose up -d
+```
+
+Services include:
+- API server (port 8080)
+- gRPC server (port 9090)
+- Worker pool (background scraping)
+- Redis (job queue)
+- Prometheus (metrics)
+- Grafana (dashboards)
+
+#### Kubernetes
+
+```console
+$ kubectl apply -f deployment/k8s/namespace.yaml
+$ kubectl apply -f deployment/k8s/deployment.yaml
+$ kubectl apply -f deployment/k8s/service.yaml
+```
+
+### Configuration
+
+Edit `configs/default.yaml` to customize:
+
+- **Server settings**: ports, timeouts, rate limits
+- **Jurisdiction policies**: rate limits per jurisdiction, robots.txt compliance
+- **Worker pool size**: concurrent scraping workers
+- **Storage backend**: PostgreSQL, MongoDB, or in-memory
+- **Job queue**: NATS or Redis Streams
+- **Observability**: logging levels, metrics collection
+
+### API Documentation
+
+Interactive API documentation is available at:
+
+- **Swagger UI**: `http://localhost:8080/swagger`
+- **OpenAPI spec**: `http://localhost:8080/openapi.json`
+- **gRPC reflection**: enabled on port `9090`
+
+### Monitoring
+
+Access observability endpoints:
+
+- **Prometheus metrics**: `http://localhost:8080/metrics`
+- **Health check**: `http://localhost:8080/health`
+- **Readiness check**: `http://localhost:8080/ready`
+- **Performance profiling**: `http://localhost:8080/debug/pprof`
+
+### Admin CLI
+
+Manage the system using the admin CLI:
+
+```console
+$ kite-admin migrate up              # Run database migrations
+$ kite-admin workers status          # Check worker health
+$ kite-admin jobs stats              # View job queue statistics
+$ kite-admin cache flush             # Clear cache
+```
+
+### Client Libraries
+
+Official client libraries are available for:
+
+- **Go**: `go get github.com/gongahkia/kite/pkg/client`
+- **Python**: `pip install kite-client`
+- **JavaScript/TypeScript**: `npm install @kite/client`
+
+Or generate your own from the OpenAPI spec using tools like [openapi-generator](https://openapi-generator.tech/).
 ```
 
 ## Support
