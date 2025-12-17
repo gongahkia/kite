@@ -5,7 +5,7 @@
 
 # `Kite`
 
-A [complete Python library](#architecture) that provides a [bundle of scrapers](#usage) for legal case law from [various jurisdictions](#support) worldwide.
+[Extensible library](#architecture) that provides a [bundle of scrapers](#usage) for legal case law from [various jurisdictions](#support) worldwide.
 
 ## Architecture
 
@@ -148,6 +148,36 @@ flowchart TD
 #### Deployment
 * *Containerization*: [Docker](https://www.docker.com/) 
 * *Orchestration*: [Kubernetes](https://kubernetes.io/) 
+* *Observability Stack*: [Prometheus](https://prometheus.io/), [Grafana](https://grafana.com/)
+
+### v4.0.0 (Go)
+
+#### Core
+* *Language*: [Go 1.22+](https://go.dev/)
+* *Web Framework*: [Fiber v2](https://gofiber.io/)
+* *HTTP Client*: [net/http](https://pkg.go.dev/net/http)
+* *Scraping*: [Colly v2](https://go-colly.org/), [goquery](https://github.com/PuerkitoBio/goquery), [chromedp](https://github.com/chromedp/chromedp)
+* *HTML Parsing*: [goquery](https://github.com/PuerkitoBio/goquery)
+* *RPC*: [gRPC](https://grpc.io/), [Protocol Buffers](https://protobuf.dev/)
+* *CLI*: [cobra](https://github.com/spf13/cobra)
+
+#### Observability
+* *Logging*: [zerolog](https://github.com/rs/zerolog) or [zap](https://github.com/uber-go/zap)
+* *Metrics*: [prometheus/client_golang](https://github.com/prometheus/client_golang)
+* *Tracing*: [OpenTelemetry](https://opentelemetry.io/docs/languages/go/)
+* *Profiling*: [pprof](https://pkg.go.dev/net/http/pprof)
+
+#### Development
+* *Package Management*: [Go Modules](https://go.dev/ref/mod)
+* *Testing*: [testify](https://github.com/stretchr/testify), [gomock](https://github.com/golang/mock), [testcontainers-go](https://golang.testcontainers.org/)
+* *Code Quality*: [golangci-lint](https://golangci-lint.run/), [staticcheck](https://staticcheck.dev/)
+* *Build Automation*: [Makefile](https://www.gnu.org/software/make/), [Taskfile](https://taskfile.dev/)
+* *Hot Reload*: [air](https://github.com/cosmtrek/air)
+
+#### Deployment
+* *Containerization*: [Docker](https://www.docker.com/) (multi-stage builds)
+* *Orchestration*: [Kubernetes](https://kubernetes.io/) 
+* *Job Queue*: [NATS](https://nats.io/), [Redis Streams](https://redis.io/docs/data-types/streams/)
 * *Observability Stack*: [Prometheus](https://prometheus.io/), [Grafana](https://grafana.com/)
 
 ## Usage
