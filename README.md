@@ -22,6 +22,14 @@ $ make build
 $ ./bin/kite-api serve --config configs/default.yaml
 ```
 
+## Client Libraries
+
+| Language | Package Manager | Installation Command |
+|----------|----------------|---------------------|
+| Go | go get | `go get github.com/gongahkia/kite/pkg/client` |
+| Python | pip | `pip install kite-client` |
+| JavaScript/TypeScript | npm | `npm install @kite/client` |
+
 ## Stack
 
 <details>
@@ -147,7 +155,7 @@ $ ./bin/kite-api serve --config configs/default.yaml
 
 </details>
 
-### Rest API Endpoints
+## Rest API Endpoints
 
 <details>
 <summary><strong>Search Cases</strong></summary>
@@ -209,7 +217,7 @@ GET /api/v1/jurisdictions
 
 </details>
 
-### Quickstart Examples
+## Quickstart Examples
 
 <details>
 <summary><strong>Using cURL</strong></summary>
@@ -306,7 +314,7 @@ $ wscat -c ws://localhost:8080/ws/jobs/{job_id}
 
 </details>
 
-### Deployment
+## Deployment
 
 <details>
 <summary><strong>Docker</strong></summary>
@@ -346,13 +354,29 @@ $ kubectl apply -f deployment/k8s/service.yaml
 
 </details>
 
-### Client Libraries
+## Support
 
-| Language | Package Manager | Installation Command |
-|----------|----------------|---------------------|
-| Go | go get | `go get github.com/gongahkia/kite/pkg/client` |
-| Python | pip | `pip install kite-client` |
-| JavaScript/TypeScript | npm | `npm install @kite/client` |
+`Kite` currently supports the following legal databases across [multiple jurisdictions](https://dictionary.cambridge.org/dictionary/english/jurisdiction).
+
+| Database | Jurisdiction | Coverage | Status |
+|----------|-------------|----------|---------|
+| CourtListener | United States | Federal & State Courts | ✅ Active |
+| FindLaw | United States | Supreme Court & State Law | ✅ Active |
+| AustLII | Australia/New Zealand | Commonwealth & State Courts | ✅ Active |
+| CanLII | Canada | Federal & Provincial Courts | ✅ Active |
+| BAILII | UK & Ireland | All UK & Irish Courts | ✅ Active |
+| Singapore Judiciary | Singapore | Official Court Judgments | ✅ Active |
+| Indian Kanoon | India | Federal & State Courts | ✅ Active |
+| HKLII | Hong Kong | Appellate & Tribunal Cases | ✅ Active |
+| Légifrance | France | Supreme & Administrative Courts | ✅ Active |
+| German Law Archive | Germany | Selected Federal Court Cases | ✅ Active |
+| Curia Europa | European Union | ECJ & General Court | ✅ Active |
+| WorldLII | International | Global Legal Databases | ✅ Active |
+| WorldCourts | International | International Court Cases | ✅ Active |
+| Supreme Court of India | India | Official Supreme Court | ✅ Active |
+| Kenya Law | Kenya | Kenyan Court Cases | ✅ Active |
+| Supreme Court of Japan | Japan | Japanese Supreme Court | ✅ Active |
+| ICC Legal Tools | International | International Criminal Law | ✅ Active |
 
 ## Architecture
 
@@ -491,37 +515,9 @@ flowchart TB
     AdminCLI --> Cache
 ```
 
-## Support
-
-> [!NOTE]
-> Each jurisdiction handles document types such as court decisions, judgments, and case law. Query the `/api/v1/jurisdictions` endpoint to see available scrapers and their capabilities.
->
-> To request a new jurisdiction or suggest improvements, please [open an issue](https://github.com/gongahkia/kite/issues).
-
-`Kite` currently supports the following legal databases across [multiple jurisdictions](https://dictionary.cambridge.org/dictionary/english/jurisdiction).
-
-| Database | Jurisdiction | Coverage | Status |
-|----------|-------------|----------|---------|
-| CourtListener | United States | Federal & State Courts | ✅ Active |
-| FindLaw | United States | Supreme Court & State Law | ✅ Active |
-| AustLII | Australia/New Zealand | Commonwealth & State Courts | ✅ Active |
-| CanLII | Canada | Federal & Provincial Courts | ✅ Active |
-| BAILII | UK & Ireland | All UK & Irish Courts | ✅ Active |
-| Singapore Judiciary | Singapore | Official Court Judgments | ✅ Active |
-| Indian Kanoon | India | Federal & State Courts | ✅ Active |
-| HKLII | Hong Kong | Appellate & Tribunal Cases | ✅ Active |
-| Légifrance | France | Supreme & Administrative Courts | ✅ Active |
-| German Law Archive | Germany | Selected Federal Court Cases | ✅ Active |
-| Curia Europa | European Union | ECJ & General Court | ✅ Active |
-| WorldLII | International | Global Legal Databases | ✅ Active |
-| WorldCourts | International | International Court Cases | ✅ Active |
-| Supreme Court of India | India | Official Supreme Court | ✅ Active |
-| Kenya Law | Kenya | Kenyan Court Cases | ✅ Active |
-| Supreme Court of Japan | Japan | Japanese Supreme Court | ✅ Active |
-| ICC Legal Tools | International | International Criminal Law | ✅ Active |
-
 ## Reference
 
 The name `Kite` is in reference to [Kite](https://hunterxhunter.fandom.com/wiki/Kite) (カイト), a prominent [Hunter](https://hunterxhunter.fandom.com/wiki/Hunter_Association) discipled by [Ging Freecss](https://hunterxhunter.fandom.com/wiki/Ging_Freecss) who later acts as [Gon Freecss](https://hunterxhunter.fandom.com/wiki/Gon_Freecss)'s mentor. He is subsequently killed by the [Royal Guard](https://hunterxhunter.fandom.com/wiki/Royal_Guards) [Neferpitou](https://hunterxhunter.fandom.com/wiki/Neferpitou) and reborn as the [Chimera Ant](https://hunterxhunter.fandom.com/wiki/Chimera_Ants) [Reina](https://hunterxhunter.fandom.com/wiki/Kite#Chimera_Ant) in the [Chimera Ant arc](https://hunterxhunter.fandom.com/wiki/Chimera_Ant_arc) of the ongoing manga series, [HunterXhunter](https://hunterxhunter.fandom.com/wiki/Hunterpedia).  
 
 ![](./asset/logo/kite.png)
+
