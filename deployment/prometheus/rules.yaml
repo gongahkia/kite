@@ -1,0 +1,325 @@
+# Prometheus Alerting Rules for Kite
+# https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+
+groups:
+  - name: kite_api
+    interval: 30s
+    rules:
+      - alert: HighAPIErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "High API error rate detected"
+          description: "API error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+          runbook_url: "https://docs.kite.example.com/runbooks/high-error-rate"
+
+      - alert: HighAPILatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le, method, path)
+          ) > 1.0
+        for: 10m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API latency detected"
+          description: "API p95 latency is {{ $value }}s for {{ $labels.method }} {{ $labels.path }} (threshold: 1s)"
+          runbook_url: "https://docs.kite.example.com/runbooks/high-latency"
+
+      - alert: APIEndpointDown
+        expr: up{job="kite-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "API endpoint is down"
+          description: "Kite API instance {{ $labels.instance }} is down"
+          runbook_url: "https://docs.kite.example.com/runbooks/api-down"
+
+      - alert: HighRequestRate
+        expr: |
+          sum(rate(http_requests_total[1m])) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "Unusually high request rate"
+          description: "Request rate is {{ $value }} req/s (may indicate DDoS or legitimate spike)"
+
+  - name: kite_workers
+    interval: 30s
+    rules:
+      - alert: WorkerQueueBacklog
+        expr: worker_queue_size > 5000
+        for: 10m
+        labels:
+          severity: warning
+          component: worker
+        annotations:
+          summary: "Worker queue backlog detected"
+          description: "Worker queue size is {{ $value }} (threshold: 5000)"
+          runbook_url: "https://docs.kite.example.com/runbooks/queue-backlog"
+
+      - alert: WorkerQueueCritical
+        expr: worker_queue_size > 10000
+        for: 5m
+        labels:
+          severity: critical
+          component: worker
+        annotations:
+          summary: "Critical worker queue backlog"
+          description: "Worker queue size is {{ $value }} (critical threshold: 10000)"
+          runbook_url: "https://docs.kite.example.com/runbooks/queue-critical"
+
+      - alert: LowWorkerUtilization
+        expr: worker_active_count / worker_total_count < 0.2
+        for: 30m
+        labels:
+          severity: info
+          component: worker
+        annotations:
+          summary: "Low worker utilization"
+          description: "Only {{ $value | humanizePercentage }} of workers are active"
+
+      - alert: HighJobFailureRate
+        expr: |
+          (
+            sum(rate(worker_jobs_processed_total{status="failed"}[5m]))
+            /
+            sum(rate(worker_jobs_processed_total[5m]))
+          ) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          component: worker
+        annotations:
+          summary: "High job failure rate"
+          description: "Job failure rate is {{ $value | humanizePercentage }} (threshold: 10%)"
+          runbook_url: "https://docs.kite.example.com/runbooks/job-failures"
+
+      - alert: AllWorkersDown
+        expr: worker_active_count == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: worker
+        annotations:
+          summary: "All workers are down"
+          description: "No active workers detected - job processing has stopped"
+          runbook_url: "https://docs.kite.example.com/runbooks/workers-down"
+
+  - name: kite_scraper
+    interval: 30s
+    rules:
+      - alert: HighScraperFailureRate
+        expr: |
+          (
+            sum(rate(scraper_requests_total{status="error"}[10m])) by (jurisdiction)
+            /
+            sum(rate(scraper_requests_total[10m])) by (jurisdiction)
+          ) > 0.3
+        for: 15m
+        labels:
+          severity: warning
+          component: scraper
+        annotations:
+          summary: "High scraper failure rate for {{ $labels.jurisdiction }}"
+          description: "Scraper failure rate is {{ $value | humanizePercentage }} for {{ $labels.jurisdiction }}"
+          runbook_url: "https://docs.kite.example.com/runbooks/scraper-failures"
+
+      - alert: ScraperBlocked
+        expr: |
+          sum(rate(scraper_requests_total{status="blocked"}[5m])) by (jurisdiction) > 0
+        for: 5m
+        labels:
+          severity: critical
+          component: scraper
+        annotations:
+          summary: "Scraper blocked for {{ $labels.jurisdiction }}"
+          description: "Scraper is being blocked (rate limit/IP ban) for {{ $labels.jurisdiction }}"
+          runbook_url: "https://docs.kite.example.com/runbooks/scraper-blocked"
+
+      - alert: SlowScraperPerformance
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(scraper_duration_seconds_bucket[10m])) by (le, jurisdiction)
+          ) > 30
+        for: 20m
+        labels:
+          severity: warning
+          component: scraper
+        annotations:
+          summary: "Slow scraper performance for {{ $labels.jurisdiction }}"
+          description: "Scraper p95 duration is {{ $value }}s for {{ $labels.jurisdiction }}"
+
+  - name: kite_database
+    interval: 30s
+    rules:
+      - alert: HighDatabaseConnections
+        expr: |
+          database_connections_active / database_connections_max > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Database connections near limit"
+          description: "Using {{ $value | humanizePercentage }} of max database connections"
+          runbook_url: "https://docs.kite.example.com/runbooks/db-connections"
+
+      - alert: SlowDatabaseQueries
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(database_query_duration_seconds_bucket[5m])) by (le, operation)
+          ) > 5.0
+        for: 10m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Slow database queries detected"
+          description: "Database query p95 duration is {{ $value }}s for {{ $labels.operation }}"
+          runbook_url: "https://docs.kite.example.com/runbooks/slow-queries"
+
+      - alert: DatabaseConnectionFailures
+        expr: |
+          rate(database_errors_total{type="connection"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Database connection failures"
+          description: "Experiencing {{ $value }} database connection failures per second"
+          runbook_url: "https://docs.kite.example.com/runbooks/db-connection-failures"
+
+  - name: kite_cache
+    interval: 30s
+    rules:
+      - alert: LowCacheHitRate
+        expr: |
+          (
+            sum(rate(cache_hits_total[10m]))
+            /
+            (sum(rate(cache_hits_total[10m])) + sum(rate(cache_misses_total[10m])))
+          ) < 0.5
+        for: 30m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate is {{ $value | humanizePercentage }} (threshold: 50%)"
+          runbook_url: "https://docs.kite.example.com/runbooks/low-cache-hit-rate"
+
+      - alert: CacheMemoryHigh
+        expr: cache_keys_count > 9000
+        for: 10m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "Cache approaching capacity"
+          description: "Cache has {{ $value }} keys (max: 10000)"
+
+  - name: kite_system
+    interval: 30s
+    rules:
+      - alert: HighMemoryUsage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+
+      - alert: HighCPUUsage
+        expr: |
+          100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: DiskSpaceLow
+        expr: |
+          (
+            node_filesystem_avail_bytes{mountpoint="/"}
+            /
+            node_filesystem_size_bytes{mountpoint="/"}
+          ) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Disk space critically low"
+          description: "Only {{ $value | humanizePercentage }} disk space remaining on {{ $labels.instance }}"
+
+      - alert: ContainerRestarting
+        expr: |
+          rate(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          component: kubernetes
+        annotations:
+          summary: "Container restarting"
+          description: "Container {{ $labels.container }} in pod {{ $labels.pod }} is restarting"
+
+  - name: kite_business
+    interval: 1m
+    rules:
+      - alert: NoRecentCaseIngestion
+        expr: |
+          rate(cases_created_total[30m]) == 0
+        for: 1h
+        labels:
+          severity: warning
+          component: business
+        annotations:
+          summary: "No cases ingested recently"
+          description: "No new cases have been ingested in the last hour"
+
+      - alert: LowDataQuality
+        expr: |
+          avg(case_quality_score) < 0.6
+        for: 2h
+        labels:
+          severity: warning
+          component: business
+        annotations:
+          summary: "Low average data quality"
+          description: "Average case quality score is {{ $value }} (threshold: 0.6)"
+
+      - alert: HighDuplicateRate
+        expr: |
+          (
+            sum(rate(duplicates_detected_total[1h]))
+            /
+            sum(rate(cases_created_total[1h]))
+          ) > 0.2
+        for: 2h
+        labels:
+          severity: warning
+          component: business
+        annotations:
+          summary: "High duplicate detection rate"
+          description: "Duplicate rate is {{ $value | humanizePercentage }} (threshold: 20%)"

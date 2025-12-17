@@ -1,0 +1,234 @@
+# AlertManager Configuration for Kite
+# https://prometheus.io/docs/alerting/latest/configuration/
+
+global:
+  # The smarthost and SMTP sender used for mail notifications.
+  smtp_smarthost: 'smtp.example.com:587'
+  smtp_from: 'kite-alerts@example.com'
+  smtp_auth_username: 'kite-alerts@example.com'
+  smtp_auth_password: '{{ env "SMTP_PASSWORD" }}'
+  smtp_require_tls: true
+
+  # Slack webhook URL
+  slack_api_url: '{{ env "SLACK_WEBHOOK_URL" }}'
+
+  # PagerDuty integration key
+  pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
+
+  # Global labels for all alerts
+  labels:
+    environment: '{{ env "ENVIRONMENT" | default "production" }}'
+    service: 'kite'
+
+# Templates for notification messages
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Route configuration
+route:
+  # Default receiver
+  receiver: 'team-notifications'
+
+  # Group alerts by these labels
+  group_by: ['alertname', 'component', 'severity']
+
+  # Wait before sending first notification for a group
+  group_wait: 30s
+
+  # Wait before sending notification about new alerts in existing group
+  group_interval: 5m
+
+  # Wait before resending notifications
+  repeat_interval: 4h
+
+  # Child routes with specific matching rules
+  routes:
+    # Critical alerts - immediate notification via PagerDuty
+    - match:
+        severity: critical
+      receiver: 'pagerduty-critical'
+      group_wait: 10s
+      group_interval: 1m
+      repeat_interval: 1h
+      continue: true  # Continue to other routes
+
+    # Critical alerts - also notify via Slack
+    - match:
+        severity: critical
+      receiver: 'slack-critical'
+      group_wait: 10s
+      group_interval: 1m
+      repeat_interval: 1h
+
+    # API component alerts
+    - match:
+        component: api
+      receiver: 'team-api'
+      group_by: ['alertname', 'instance']
+      routes:
+        - match:
+            severity: warning
+          receiver: 'slack-api-warnings'
+
+    # Worker component alerts
+    - match:
+        component: worker
+      receiver: 'team-workers'
+      routes:
+        - match:
+            alertname: 'AllWorkersDown'
+          receiver: 'pagerduty-critical'
+          group_wait: 10s
+
+    # Scraper component alerts
+    - match:
+        component: scraper
+      receiver: 'team-scraper'
+      routes:
+        - match:
+            alertname: 'ScraperBlocked'
+          receiver: 'slack-scraper-urgent'
+
+    # Database alerts
+    - match:
+        component: database
+      receiver: 'team-database'
+      routes:
+        - match:
+            severity: critical
+          receiver: 'pagerduty-database'
+
+    # Business metrics alerts
+    - match:
+        component: business
+      receiver: 'team-product'
+
+    # Info level alerts - no PagerDuty, just email/Slack
+    - match:
+        severity: info
+      receiver: 'slack-info'
+      repeat_interval: 24h
+
+# Inhibition rules - suppress certain alerts when others are firing
+inhibit_rules:
+  # If API is down, suppress latency and error rate alerts
+  - source_match:
+      alertname: 'APIEndpointDown'
+      severity: 'critical'
+    target_match:
+      component: 'api'
+    equal: ['instance']
+
+  # If all workers are down, suppress queue backlog alerts
+  - source_match:
+      alertname: 'AllWorkersDown'
+    target_match:
+      alertname: 'WorkerQueueBacklog'
+
+  # If database connection is failing, suppress slow query alerts
+  - source_match:
+      alertname: 'DatabaseConnectionFailures'
+    target_match:
+      component: 'database'
+    equal: ['instance']
+
+  # Higher severity suppresses lower severity for same alert
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'component', 'instance']
+
+# Receiver configurations
+receivers:
+  # Default team notifications (email + Slack)
+  - name: 'team-notifications'
+    email_configs:
+      - to: 'kite-team@example.com'
+        headers:
+          Subject: '[{{ .GroupLabels.severity | toUpper }}] {{ .GroupLabels.alertname }}'
+        html: '{{ template "email.default.html" . }}'
+    slack_configs:
+      - channel: '#kite-alerts'
+        title: '[{{ .GroupLabels.severity | toUpper }}] {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+        color: '{{ if eq .GroupLabels.severity "critical" }}danger{{ else if eq .GroupLabels.severity "warning" }}warning{{ else }}good{{ end }}'
+
+  # PagerDuty for critical alerts
+  - name: 'pagerduty-critical'
+    pagerduty_configs:
+      - service_key: '{{ env "PAGERDUTY_SERVICE_KEY" }}'
+        description: '{{ .GroupLabels.alertname }}: {{ .GroupLabels.component }}'
+        severity: 'critical'
+
+  - name: 'pagerduty-database'
+    pagerduty_configs:
+      - service_key: '{{ env "PAGERDUTY_DATABASE_KEY" }}'
+        description: 'Database Alert: {{ .GroupLabels.alertname }}'
+        severity: '{{ .GroupLabels.severity }}'
+
+  # Slack channels by severity
+  - name: 'slack-critical'
+    slack_configs:
+      - channel: '#kite-critical'
+        username: 'Kite AlertManager'
+        icon_emoji: ':rotating_light:'
+        title: 'CRITICAL: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+        color: 'danger'
+        actions:
+          - type: button
+            text: 'View Runbook'
+            url: '{{ (index .Alerts 0).Annotations.runbook_url }}'
+          - type: button
+            text: 'Grafana Dashboard'
+            url: 'https://grafana.example.com/d/kite-overview'
+
+  - name: 'slack-info'
+    slack_configs:
+      - channel: '#kite-info'
+        title: 'Info: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+        color: 'good'
+
+  # Team-specific receivers
+  - name: 'team-api'
+    email_configs:
+      - to: 'kite-api-team@example.com'
+    slack_configs:
+      - channel: '#kite-api'
+
+  - name: 'slack-api-warnings'
+    slack_configs:
+      - channel: '#kite-api'
+        color: 'warning'
+
+  - name: 'team-workers'
+    email_configs:
+      - to: 'kite-workers-team@example.com'
+    slack_configs:
+      - channel: '#kite-workers'
+
+  - name: 'team-scraper'
+    email_configs:
+      - to: 'kite-scraper-team@example.com'
+    slack_configs:
+      - channel: '#kite-scraper'
+
+  - name: 'slack-scraper-urgent'
+    slack_configs:
+      - channel: '#kite-scraper'
+        color: 'danger'
+        title: 'URGENT: {{ .GroupLabels.alertname }}'
+
+  - name: 'team-database'
+    email_configs:
+      - to: 'kite-database-team@example.com'
+    slack_configs:
+      - channel: '#kite-database'
+
+  - name: 'team-product'
+    email_configs:
+      - to: 'kite-product-team@example.com'
+    slack_configs:
+      - channel: '#kite-product-metrics'

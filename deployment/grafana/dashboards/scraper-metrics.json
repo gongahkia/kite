@@ -1,0 +1,193 @@
+{
+  "dashboard": {
+    "title": "Kite Scraper Metrics",
+    "tags": ["kite", "scraper", "jurisdiction"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Scraper Success Rate by Jurisdiction",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 0, "w": 24, "h": 8},
+        "targets": [
+          {
+            "expr": "(sum(rate(scraper_requests_total{status=\"success\"}[10m])) by (jurisdiction) / sum(rate(scraper_requests_total[10m])) by (jurisdiction)) * 100",
+            "legendFormat": "{{jurisdiction}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "percent", "min": 0, "max": 100, "label": "Success Rate"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Scraper Request Rate",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(scraper_requests_total[5m])) by (jurisdiction, status)",
+            "legendFormat": "{{jurisdiction}} - {{status}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Scraper Latency by Jurisdiction",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(scraper_duration_seconds_bucket[10m])) by (le, jurisdiction))",
+            "legendFormat": "p95 - {{jurisdiction}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Duration"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Cases Scraped (Last Hour)",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 16, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(increase(scraper_cases_scraped_total[1h]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 0
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Cases Scraped by Jurisdiction (Last Hour)",
+        "type": "piechart",
+        "gridPos": {"x": 8, "y": 16, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "sum by (jurisdiction) (increase(scraper_cases_scraped_total[1h]))",
+            "legendFormat": "{{jurisdiction}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Active Scrapers",
+        "type": "stat",
+        "gridPos": {"x": 16, "y": 16, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "count(scraper_active{status=\"running\"})",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 1, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "Scraper Errors by Jurisdiction",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(scraper_requests_total{status=~\"error|blocked\"}[1h])) by (jurisdiction, status)",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {"Time": true},
+              "renameByName": {"jurisdiction": "Jurisdiction", "status": "Status", "Value": "Error Rate"}
+            }
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Rate Limit Status",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "scraper_rate_limit_remaining by (jurisdiction)",
+            "legendFormat": "{{jurisdiction}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Requests Remaining"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Robots.txt Cache Hits",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 32, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "(sum(rate(scraper_robots_cache_hits[5m])) / (sum(rate(scraper_robots_cache_hits[5m])) + sum(rate(scraper_robots_cache_misses[5m])))) * 100",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 1
+          }
+        }
+      },
+      {
+        "id": 10,
+        "title": "Scraper Failures Over Time",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 32, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(scraper_requests_total{status=\"error\"}[5m])) by (jurisdiction)",
+            "legendFormat": "{{jurisdiction}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps", "label": "Failures/sec"},
+          {"format": "short"}
+        ]
+      }
+    ]
+  }
+}
