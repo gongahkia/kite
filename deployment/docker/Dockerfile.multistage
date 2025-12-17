@@ -1,0 +1,51 @@
+# Multi-stage Docker build for Kite API
+FROM golang:1.22-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache git make
+
+WORKDIR /build
+
+# Copy go mod files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build the API server
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o kite-api ./cmd/kite-api
+
+# Build the worker
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o kite-worker ./cmd/kite-worker
+
+# Build the admin CLI
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o kite-admin ./cmd/kite-admin
+
+# Final stage - API
+FROM alpine:3.19 AS api
+
+RUN apk --no-cache add ca-certificates tzdata
+
+WORKDIR /app
+
+COPY --from=builder /build/kite-api .
+COPY --from=builder /build/configs ./configs
+
+EXPOSE 8080 9091
+
+ENTRYPOINT ["./kite-api"]
+
+# Final stage - Worker
+FROM alpine:3.19 AS worker
+
+RUN apk --no-cache add ca-certificates tzdata
+
+WORKDIR /app
+
+COPY --from=builder /build/kite-worker .
+COPY --from=builder /build/configs ./configs
+
+EXPOSE 9091
+
+ENTRYPOINT ["./kite-worker"]
